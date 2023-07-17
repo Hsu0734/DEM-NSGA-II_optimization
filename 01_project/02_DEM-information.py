@@ -8,7 +8,7 @@ wbe.verbose = False
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
 
 # web read DEM data
-dem = wbe.read_raster('DTM_1km_6177_722.tif')
+dem = wbe.read_raster('DEM_demo.tif')
 
 # size and resolution
 print(f'Rows: {dem.configs.rows}')
