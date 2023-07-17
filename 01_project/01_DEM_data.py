@@ -6,8 +6,22 @@ Date: Jul 17, 2023
 
 import rasterio as rs
 from rasterio.plot import show
+import matplotlib.pyplot as plt
 
 # read and print the DEM data
-path_00 = '../00_data_source/SIMRAIN_1km_6175_727.tif'
+path_00 = '../00_data_source/DTM_1km_6177_722.tif'
 data_00 = rs.open(path_00)
-print(show(data_00, cmap='winter', title='DEM_small'))
+# print(show(data_00, title='DTM_1km_6177_722'))
+
+
+# creat a plot
+fig, ax = plt.subplots(figsize=(8, 8))
+show(data_00, title='DTM_1km_6177_722', ax=ax)
+
+plt.ticklabel_format(style='plain')
+# ax.get_xaxis().get_major_formatter().set_scientific(False)  # 关闭科学计数法
+# ax.get_yaxis().get_major_formatter().set_scientific(False)  # 关闭科学计数法
+
+# grid and show plot
+ax.grid(True, linestyle='--', color='black')
+plt.show()
