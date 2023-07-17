@@ -14,10 +14,10 @@ path_length = wbe.new_raster(flow_accum.configs)
 for row in range(flow_accum.configs.rows):
     for col in range(flow_accum.configs.columns):
         elev = flow_accum[row, col] # Read a cell value from a Raster
-        if elev >= 400.0 and elev != flow_accum.configs.nodata:
+        if elev >= 200.0 and elev != flow_accum.configs.nodata:
             path_length[row, col] = 1.0 # Write the cell value of a Raster
 
-        elif elev < 400.0 or elev == flow_accum.configs.nodata:
+        elif elev < 200.0 or elev == flow_accum.configs.nodata:
             path_length[row, col] = 0.0
 wbe.write_raster(path_length, 'DEM_demo_path.tif', compress=True)
 
@@ -35,5 +35,15 @@ plt.ticklabel_format(style='plain')
 # grid and show plot
 ax.grid(True, linestyle='--', color='grey')
 plt.show()
+
+
+# value
+Path_value = []
+for row in range(path_length.configs.rows):
+    for col in range(path_length.configs.columns):
+        elev = path_length[row, col]
+        Path_value.append(elev)
+
+print(sum(Path_value))
 
 
