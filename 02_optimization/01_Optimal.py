@@ -16,7 +16,7 @@ import pandas as pd
 wbe = wbw.WbEnvironment()
 wbe.verbose = False
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
-dem = wbe.read_raster('DEM_demo.tif')
+dem = wbe.read_raster('Hanwen.tif')
 n_grid = int(dem.configs.rows) * int(dem.configs.columns) # 栅格总数
 
 # creat a blank raster image of same size as the dem
