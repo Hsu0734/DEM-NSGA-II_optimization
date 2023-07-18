@@ -14,6 +14,11 @@ velocity = wbe.new_raster(slope.configs)
 
 for row in range(slope.configs.rows):
     for col in range(slope.configs.columns):
+        elev = flow_accum[row, col]
+        if elev == flow_accum.configs.nodata:
+            velocity[row, col] = flow_accum.configs.nodata
+
+        elif elev != flow_accum.configs.nodata:
             velocity[row, col] = (flow_accum[row, col] ** 0.4 * slope[row, col] ** 0.3)/(5 ** 0.4 * 0.03 ** 0.6)
 
 wbe.write_raster(velocity, 'DEM_demo_velocity.tif', compress=True)
@@ -42,6 +47,6 @@ for row in range(velocity.configs.rows):
         elev = velocity[row, col]
         Velocity_value.append(elev)
 
-print(Velocity_value)
+# print(Velocity_value)
 print(max(Velocity_value))
 print(min(Velocity_value))

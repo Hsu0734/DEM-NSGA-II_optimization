@@ -8,7 +8,7 @@ wbe.verbose = False
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
 
 # web read DEM data
-dem = wbe.read_raster('DEM_demo.tif')
+dem = wbe.read_raster('Hanwen.tif')
 
 # size and resolution
 print(f'Rows: {dem.configs.rows}')
@@ -28,10 +28,10 @@ print(f'Max value: {dem.configs.maximum}')
 print(f'Nodata value: {dem.configs.nodata}')
 
 # each pixel data
-Elevation = []
+'''Elevation = []
 for row in range(dem.configs.rows):
     for col in range(dem.configs.columns):
         elev = dem[row, col]
         Elevation.append(elev)
 
-print(Elevation)
+print(Elevation)'''

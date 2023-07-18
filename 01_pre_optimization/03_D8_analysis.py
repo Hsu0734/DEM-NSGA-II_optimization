@@ -8,10 +8,11 @@ wbe.verbose = False
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
 
 # web read DEM data
-dem = wbe.read_raster('DEM_demo.tif')
+dem = wbe.read_raster('Hanwen.tif')
 
 # hydrological analysis
-flow_accu = wbe.d8_flow_accum(dem)
+depression = wbe.fill_depressions(dem)
+flow_accu = wbe.d8_flow_accum(depression)
 wbe.write_raster(flow_accu, 'DEM_demo_d8.tif', compress=True)
 
 
@@ -37,6 +38,6 @@ for row in range(flow_accu.configs.rows):
         elev = flow_accu[row, col]
         Flow_accum_value.append(elev)
 
-print(Flow_accum_value)
+# print(Flow_accum_value)
 print(max(Flow_accum_value))
 print(min(Flow_accum_value))

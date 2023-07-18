@@ -8,7 +8,7 @@ wbe.verbose = False
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
 
 # web read DEM data
-dem = wbe.read_raster('DEM_demo.tif')
+dem = wbe.read_raster('Hanwen.tif')
 
 # slope analysis
 slope = wbe.slope(dem)
@@ -38,6 +38,6 @@ for row in range(slope.configs.rows):
         elev = slope[row, col]
         Slope_value.append(elev)
 
-print(Slope_value)
+# print(Slope_value)
 print(max(Slope_value))
 print(min(Slope_value))
