@@ -8,7 +8,7 @@ wbe.verbose = False
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
 
 # web read DEM data
-dem = wbe.read_raster('Hanwen.tif')
+dem = wbe.read_raster('DEM_demo_resample.tif')
 
 # slope analysis
 slope = wbe.slope(dem)
@@ -36,7 +36,8 @@ Slope_value = []
 for row in range(slope.configs.rows):
     for col in range(slope.configs.columns):
         elev = slope[row, col]
-        Slope_value.append(elev)
+        if elev != slope.configs.nodata:
+            Slope_value.append(elev)
 
 # print(Slope_value)
 print(max(Slope_value))
