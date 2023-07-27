@@ -15,15 +15,19 @@ import pandas as pd
 
 wbe = wbw.WbEnvironment()
 wbe.verbose = False
+
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
-dem = wbe.read_raster('Hanwen.tif')
+dem = wbe.read_raster('DEM_demo_resample.tif')
 n_grid = int(dem.configs.rows) * int(dem.configs.columns) # 栅格总数
 
 # creat a blank raster image of same size as the dem
 cut_and_fill = wbe.new_raster(dem.configs)
 for row in range(dem.configs.rows):
     for col in range(dem.configs.columns):
-        cut_and_fill[row, col] = 0.0
+        if dem[row, col] == dem.configs.nodata:
+            cut_and_fill[row, col] = dem.configs.nodata
+        elif dem[row, col] != dem.configs.nodata:
+            cut_and_fill[row, col] = 0.0
 
 
 # ------------------------------------------ #
@@ -65,19 +69,18 @@ def path_sum_calculation(var_list):
 
     # creat dem_pop
     dem_pop = dem - cut_and_fill
+    dem_pop_dep = wbe.fill_depressions(dem_pop)
 
     # path length calculation
-    wbe = wbw.WbEnvironment()
-    wbe.verbose = False
-    flow_accum = wbe.d8_flow_accum(dem_pop, out_type="sca")
+    flow_accum = wbe.d8_flow_accum(dem_pop_dep, out_type="sca")
     path_length = wbe.new_raster(flow_accum.configs)
 
     for row in range(flow_accum.configs.rows):
         for col in range(flow_accum.configs.columns):
             elev = flow_accum[row, col] # Read a cell value from a Raster
-            if elev >= 200.0 and elev != flow_accum.configs.nodata:
+            if elev >= 0.83 and elev != flow_accum.configs.nodata:
                 path_length[row, col] = 1.0
-            elif elev < 200.0 or elev == flow_accum.configs.nodata:
+            elif elev < 0.83 or elev == flow_accum.configs.nodata:
                 path_length[row, col] = 0.0
 
     path = []
@@ -96,26 +99,35 @@ def velocity_calculation(var_list):
             cut_and_fill[row, col] = var_list[i]
             i = i + 1
 
-    # creat dem_pop
-    dem_pop = dem - cut_and_fill
+    # creat dem_pop_02
+    dem_pop_02 = dem - cut_and_fill
+    dem_pop_02_dep = wbe.fill_depressions(dem_pop_02)
 
     # path length calculation
-    wbe = wbw.WbEnvironment()
-    wbe.verbose = False
-    flow_accum = wbe.d8_flow_accum(dem_pop, out_type="sca")
-    slope = wbe.slope(dem_pop)
+    flow_accum = wbe.d8_flow_accum(dem_pop_02_dep, out_type="sca")
+    slope = wbe.slope(dem_pop_02_dep)
 
-    velocity = wbe.new_raster(dem_pop.configs)
+    velocity = wbe.new_raster(dem_pop_02.configs)
 
     for row in range(slope.configs.rows):
         for col in range(slope.configs.columns):
-            velocity[row, col] = (flow_accum[row, col] ** 0.4 * slope[row, col] ** 0.3) / (5 ** 0.4 * 0.03 ** 0.6)
+            velo = flow_accum[row, col]
+
+            if velo == flow_accum.configs.nodata:
+                velocity[row, col] = flow_accum.configs.nodata
+
+            elif velo != flow_accum.configs.nodata:
+                velocity[row, col] = ((flow_accum[row, col] * 0.01) ** 0.4 * slope[row, col] ** 0.3) / (
+                            5 ** 0.4 * 0.03 ** 0.6)
 
 
     Velocity_value = []
     for row in range(velocity.configs.rows):
         for col in range(velocity.configs.columns):
-            Velocity_value.append(velocity[row, col])
+            velo = velocity[row, col]
+
+            if velo != flow_accum.configs.nodata:
+                Velocity_value.append(velocity[row, col])
 
     max_velocity = max(Velocity_value)
     return max_velocity
@@ -141,7 +153,7 @@ algorithm = NSGA2(
 )
 
 
-termination = get_termination("n_gen", 500)
+termination = get_termination("n_gen", 300)
 
 from pymoo.optimize import minimize
 res = minimize(problem,
@@ -166,7 +178,7 @@ plt.title("Objective Space")
 plt.show()
 
 # Decision making
-from pymoo.decomposition.asf import ASF
+'''from pymoo.decomposition.asf import ASF
 
 weights = np.array([0.5, 0.5])
 approx_ideal = F.min(axis=0)
@@ -202,4 +214,4 @@ for i in range(10):
             after_dem = dem - solution_dem
             filename = f'DEM_solution_{i}.tif'
             wbe.write_raster(after_dem, file_name=filename, compress=True)
-            p = p + 1
+            p = p + 1'''
