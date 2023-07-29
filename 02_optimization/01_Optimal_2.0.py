@@ -109,30 +109,26 @@ def velocity_calculation(var_list):
     dem_pop_02_dep = wbe.fill_depressions(dem_pop_02)
 
     # path length calculation
-    flow_accum = wbe.d8_flow_accum(dem_pop_02_dep, out_type="sca")
+    flow_accum_02 = wbe.d8_flow_accum(dem_pop_02_dep, out_type="sca")
     slope = wbe.slope(dem_pop_02)
 
     velocity = wbe.new_raster(dem_pop_02.configs)
 
     for row in range(slope.configs.rows):
         for col in range(slope.configs.columns):
-            velo = flow_accum[row, col]
+            velo = flow_accum_02[row, col]
 
-            if velo == flow_accum.configs.nodata:
-                velocity[row, col] = flow_accum.configs.nodata
-
-            elif velo != flow_accum.configs.nodata:
-                velocity[row, col] = ((flow_accum[row, col] * 0.01) ** 0.4 * slope[row, col] ** 0.3) / (
+            if velo == flow_accum_02.configs.nodata:
+                velocity[row, col] = 0.0
+            elif velo != flow_accum_02.configs.nodata:
+                velocity[row, col] = ((flow_accum_02[row, col] * 0.01) ** 0.4 * slope[row, col] ** 0.3) / (
                             5 ** 0.4 * 0.03 ** 0.6)
 
 
     Velocity_value = []
     for row in range(velocity.configs.rows):
         for col in range(velocity.configs.columns):
-            velo = velocity[row, col]
-
-            if velo != flow_accum.configs.nodata:
-                Velocity_value.append(velocity[row, col])
+            Velocity_value.append(velocity[row, col])
 
     max_velocity = max(Velocity_value)
     return max_velocity
@@ -173,15 +169,37 @@ F = res.F
 
 
 # Visualization of Objective space or Variable space
-from pymoo.util.ref_dirs import get_reference_directions
+import numpy as np
 from pymoo.visualization.scatter import Scatter
+
+plot = Scatter(tight_layout=True)
+plot.add(F, s=10)
+plot.show()
+
+import matplotlib.pyplot as plt
+plt.figure(figsize=(7, 5))
+plt.scatter(F[:, 0], F[:, 1], s=30, facecolors='none', edgecolors='blue')
+plt.title("Objective Space")
+plt.show()
+
+plt.scatter(F[:, 1], F[:, 2], s=30, facecolors='none', edgecolors='blue')
+plt.title("Objective Space")
+plt.show()
+
+plt.scatter(F[:, 0], F[:, 2], s=30, facecolors='none', edgecolors='blue')
+plt.title("Objective Space")
+plt.show()
+
+
+'''from pymoo.util.ref_dirs import get_reference_directions
+
 ref_dirs = get_reference_directions("uniform", 3, n_partitions=12)
 
 plot = Scatter()
 plot.add(F)
 plot.show()
 
-'''import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 
 # xl, xu = problem.bounds()
