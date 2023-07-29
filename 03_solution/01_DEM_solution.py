@@ -1,5 +1,6 @@
 import rasterio as rs
 import matplotlib.pyplot as plt
+from rasterio.plot import show
 
 # 定义DEM文件路径列表
 dem_files = []
@@ -10,7 +11,7 @@ for i in range(10):
 
 
 # 创建一个子图网格
-fig, axes = plt.subplots(nrows=2, ncols=5, figsize=(12, 6))
+fig, axes = plt.subplots(nrows=2, ncols=5, figsize=(36, 12))
 
 # 遍历DEM文件
 for i, dem_file in enumerate(dem_files):
@@ -21,10 +22,18 @@ for i, dem_file in enumerate(dem_files):
     row = i // 5  # 行索引
     col = i % 5  # 列索引
 
-    axes[row, col].imshow(data_dem.read(1), cmap='winter')
+    show(data_dem, title=f'DEM_solution_{10 * i}', ax=axes[row, col])
     axes[row, col].set_title(dem_file)
-    axes[row, col].axis('off')
+    axes[row, col].axis('on')
+    axes[row, col].ticklabel_format(style='plain')
+    axes[row, col].grid(True, linestyle='--', color='black')
 
 # 显示图形
-plt.tight_layout()
+cbar_ax = fig.add_axes([0.9, 0.15, 0.02, 0.7])  # 调整colorbar位置和大小
+cbar = plt.colorbar(axes[0, 0].images[0], cax=cbar_ax)
+cbar.ax.tick_params(labelsize=12)
+# plt.tight_layout()
+plt.subplots_adjust(left=0.05, right=0.88, bottom=0.1, top=0.9,
+                    wspace=0.4, hspace=0.1)
+plt.suptitle("All DEM_solution figure", fontsize=30)
 plt.show()
