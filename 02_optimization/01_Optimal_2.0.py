@@ -2,15 +2,12 @@
 Multi-objective optimization: terrain optimal module
 Author: Hanwen Xu
 Version: 1
-Date: Jul 17, 2023
+Date: Jul 29, 2023
 '''
 
 import whitebox_workflows as wbw
-import rasterio as rs
-from rasterio.plot import show, show_hist
 from pymoo.core.problem import ElementwiseProblem
 import numpy as np
-import pandas as pd
 
 
 wbe = wbw.WbEnvironment()
@@ -18,17 +15,19 @@ wbe.verbose = False
 
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
 dem = wbe.read_raster('DEM_demo_resample.tif')
-n_grid = int(dem.configs.rows) * int(dem.configs.columns) # 栅格总数
 
 # creat a blank raster image of same size as the dem
 cut_and_fill = wbe.new_raster(dem.configs)
+# number of valid grid
+n_grid = 0
+
 for row in range(dem.configs.rows):
     for col in range(dem.configs.columns):
         if dem[row, col] == dem.configs.nodata:
             cut_and_fill[row, col] = dem.configs.nodata
         elif dem[row, col] != dem.configs.nodata:
             cut_and_fill[row, col] = 0.0
-
+            n_grid = n_grid + 1
 
 # ------------------------------------------ #
 # define MOO problem
@@ -55,7 +54,7 @@ class MyProblem(ElementwiseProblem):
         velocity_function = velocity_calculation(var_list)
 
         # notice your funciotn shoube < 0
-        g1 = sum(var_list) * 100 - 50000
+        g1 = sum(var_list) * 100 - 100000
 
         out["F"] = [earth_volume_function, flow_length_function, velocity_function]
         out["G"] = [g1]
@@ -64,8 +63,11 @@ def path_sum_calculation(var_list):
     i = 0
     for row in range(dem.configs.rows):
         for col in range(dem.configs.columns):
-            cut_and_fill[row, col] = var_list[i]
-            i = i + 1
+            if dem[row, col] == dem.configs.nodata:
+                cut_and_fill[row, col] = dem.configs.nodata
+            elif dem[row, col] != dem.configs.nodata:
+                cut_and_fill[row, col] = var_list[i]
+                i = i + 1
 
     # creat dem_pop
     dem_pop = dem - cut_and_fill
@@ -96,8 +98,11 @@ def velocity_calculation(var_list):
     i = 0
     for row in range(dem.configs.rows):
         for col in range(dem.configs.columns):
-            cut_and_fill[row, col] = var_list[i]
-            i = i + 1
+            if dem[row, col] == dem.configs.nodata:
+                cut_and_fill[row, col] = dem.configs.nodata
+            elif dem[row, col] != dem.configs.nodata:
+                cut_and_fill[row, col] = var_list[i]
+                i = i + 1
 
     # creat dem_pop_02
     dem_pop_02 = dem - cut_and_fill
@@ -144,7 +149,7 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.termination import get_termination
 
 algorithm = NSGA2(
-    pop_size=500,
+    pop_size=50,
     n_offsprings=25,
     sampling=FloatRandomSampling(),
     crossover=SBX(prob=0.9, eta=15),
@@ -153,7 +158,7 @@ algorithm = NSGA2(
 )
 
 
-termination = get_termination("n_gen", 40)
+termination = get_termination("n_gen", 100)
 
 from pymoo.optimize import minimize
 res = minimize(problem,
@@ -168,17 +173,25 @@ F = res.F
 
 
 # Visualization of Objective space or Variable space
-import matplotlib.pyplot as plt
+from pymoo.util.ref_dirs import get_reference_directions
 from pymoo.visualization.scatter import Scatter
+ref_dirs = get_reference_directions("uniform", 3, n_partitions=12)
+
+plot = Scatter()
+plot.add(F)
+plot.show()
+
+'''import matplotlib.pyplot as plt
+
 
 # xl, xu = problem.bounds()
 plt.figure(figsize=(7, 5))
-plt.scatter(F[:, 0], F[:, 1], s=30, facecolors='none', edgecolors='blue')
+plt.scatter(F[:, 0], F[:, 1], F[:, 2], s=30, facecolors='none', edgecolors='blue')
 plt.title("Objective Space")
 plt.show()
 
 # Decision making
-'''from pymoo.decomposition.asf import ASF
+from pymoo.decomposition.asf import ASF
 
 weights = np.array([0.5, 0.5])
 approx_ideal = F.min(axis=0)
