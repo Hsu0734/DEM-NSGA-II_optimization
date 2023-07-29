@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 dem_files = []
 
 for i in range(10):
-    filename = f'DEM_solution_{10 * i}.tif'
+    filename = f'DEM_after_{10 * i}.tif'
     dem_files.append(filename)
 
 

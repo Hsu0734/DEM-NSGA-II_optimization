@@ -39,5 +39,5 @@ for row in range(flow_accu.configs.rows):
             Flow_accum_value.append(elev)
 
 # print(Flow_accum_value)
-print(max(Flow_accum_value)/100)
-print(min(Flow_accum_value)/100)
+print(max(Flow_accum_value))
+print(min(Flow_accum_value))

@@ -8,6 +8,7 @@ Date: Jul 29, 2023
 import whitebox_workflows as wbw
 from pymoo.core.problem import ElementwiseProblem
 import numpy as np
+import pandas as pd
 
 
 wbe = wbw.WbEnvironment()
@@ -71,7 +72,7 @@ def path_sum_calculation(var_list):
 
     # creat dem_pop
     dem_pop = dem - cut_and_fill
-    dem_pop_dep = wbe.fill_depressions(dem_pop)
+    dem_pop_dep = wbe.breach_depressions_least_cost(dem_pop)
 
     # path length calculation
     flow_accum = wbe.d8_flow_accum(dem_pop_dep, out_type="sca")
@@ -80,9 +81,9 @@ def path_sum_calculation(var_list):
     for row in range(flow_accum.configs.rows):
         for col in range(flow_accum.configs.columns):
             elev = flow_accum[row, col] # Read a cell value from a Raster
-            if elev >= 0.83 and elev != flow_accum.configs.nodata:
+            if elev >= 83 and elev != flow_accum.configs.nodata:
                 path_length[row, col] = 1.0
-            elif elev < 0.83 or elev == flow_accum.configs.nodata:
+            elif elev < 83 or elev == flow_accum.configs.nodata:
                 path_length[row, col] = 0.0
 
     path = []
@@ -106,7 +107,7 @@ def velocity_calculation(var_list):
 
     # creat dem_pop_02
     dem_pop_02 = dem - cut_and_fill
-    dem_pop_02_dep = wbe.fill_depressions(dem_pop_02)
+    dem_pop_02_dep = wbe.breach_depressions_least_cost(dem_pop_02)
 
     # path length calculation
     flow_accum_02 = wbe.d8_flow_accum(dem_pop_02_dep, out_type="sca")
@@ -145,8 +146,8 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.termination import get_termination
 
 algorithm = NSGA2(
-    pop_size=50,
-    n_offsprings=25,
+    pop_size=100,
+    n_offsprings=50,
     sampling=FloatRandomSampling(),
     crossover=SBX(prob=0.9, eta=15),
     mutation=PM(eta=20),
@@ -154,7 +155,7 @@ algorithm = NSGA2(
 )
 
 
-termination = get_termination("n_gen", 100)
+termination = get_termination("n_gen", 20)
 
 from pymoo.optimize import minimize
 res = minimize(problem,
@@ -169,47 +170,34 @@ F = res.F
 
 
 # Visualization of Objective space or Variable space
-import numpy as np
 from pymoo.visualization.scatter import Scatter
+import matplotlib.pyplot as plt
 
+# 3D Visuliaztion
 plot = Scatter(tight_layout=True)
 plot.add(F, s=10)
 plot.show()
 
-import matplotlib.pyplot as plt
+# 2D Pairwise Scatter Plots
 plt.figure(figsize=(7, 5))
 plt.scatter(F[:, 0], F[:, 1], s=30, facecolors='none', edgecolors='blue')
-plt.title("Objective Space")
+plt.title("Flow path length (y) and total cost (x)")
+plt.grid
 plt.show()
 
 plt.scatter(F[:, 1], F[:, 2], s=30, facecolors='none', edgecolors='blue')
-plt.title("Objective Space")
+plt.title("Max velocity (y) and flow path length (x)")
+plt.grid
 plt.show()
 
 plt.scatter(F[:, 0], F[:, 2], s=30, facecolors='none', edgecolors='blue')
-plt.title("Objective Space")
+plt.title("Max velocity (y) and total cost (x)")
+plt.grid
 plt.show()
 
 
-'''from pymoo.util.ref_dirs import get_reference_directions
-
-ref_dirs = get_reference_directions("uniform", 3, n_partitions=12)
-
-plot = Scatter()
-plot.add(F)
-plot.show()
-
-import matplotlib.pyplot as plt
-
-
-# xl, xu = problem.bounds()
-plt.figure(figsize=(7, 5))
-plt.scatter(F[:, 0], F[:, 1], F[:, 2], s=30, facecolors='none', edgecolors='blue')
-plt.title("Objective Space")
-plt.show()
-
-# Decision making
-from pymoo.decomposition.asf import ASF
+### Decision making ###
+'''from pymoo.decomposition.asf import ASF
 
 weights = np.array([0.5, 0.5])
 approx_ideal = F.min(axis=0)
@@ -220,11 +208,11 @@ i = decomp.do(nF, 1/weights).argmin()
 print("Best regarding ASF: Point \ni = %s\nF = %s" % (i, F[i]))
 
 plt.figure(figsize=(7, 5))
-plt.scatter(F[:, 0], F[:, 1], s=30, facecolors='none', edgecolors='blue')
+plt.scatter(F, s=30, facecolors='none', edgecolors='blue')
 plt.scatter(F[i, 0], F[i, 1], marker="x", color="red", s=200)
 plt.title("Objective Space")
 plt.grid
-plt.show()
+plt.show()'''
 
 
 # save the data
@@ -233,16 +221,23 @@ result_df.to_csv('output.csv', index=False)
 
 
 # visualization of solution set
-wbe.working_directory = r'D:\PhD career\05 SCI papers\06 Multi-objective optimization\MOO practices\Solution'
+wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\03_solution'
 for i in range(10):
-    solution = res.X[2 * i] # 每隔一个取一个解
-
+    solution = res.X[10 * i] # 每隔十个取一个解
     solution_dem = wbe.new_raster(dem.configs)
+
     p = 0
     for row in range(dem.configs.rows):
         for col in range(dem.configs.columns):
-            solution_dem[row, col] = solution[p]
-            after_dem = dem - solution_dem
-            filename = f'DEM_solution_{i}.tif'
-            wbe.write_raster(after_dem, file_name=filename, compress=True)
-            p = p + 1'''
+            if dem[row, col] == dem.configs.nodata:
+                solution_dem[row, col] = dem.configs.nodata
+            elif dem[row, col] != dem.configs.nodata:
+                solution_dem[row, col] = solution[p]
+                p = p + 1
+
+    after_dem = dem - solution_dem
+    filename = f'DEM_after_{10 * i}.tif'    #地形改动之后的结果
+    wbe.write_raster(after_dem, file_name=filename, compress=True)
+
+    filename_X = f'DEM_solution_{10 * i}.tif'   #地形自身的改动量
+    wbe.write_raster(solution_dem, file_name=filename_X, compress=True)
