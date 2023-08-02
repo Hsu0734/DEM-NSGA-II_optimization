@@ -36,4 +36,5 @@ cbar.ax.tick_params(labelsize=12)
 plt.subplots_adjust(left=0.05, right=0.88, bottom=0.1, top=0.9,
                     wspace=0.4, hspace=0.1)
 plt.suptitle("All DEM_after figure", fontsize=30)
+plt.savefig("All DEM_after figure")
 plt.show()
