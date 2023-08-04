@@ -30,7 +30,8 @@ wbe.write_raster(path_length, 'DEM_demo_path.tif', compress=True)
 path_02 = '../00_data_source/DEM_demo_path.tif'
 data_02 = rs.open(path_02)
 
-fig, ax = plt.subplots(figsize=(8, 8))
+fig, ax = plt.subplots(figsize=(16, 16))
+ax.tick_params(axis='both', which='major', labelsize=20)
 show(data_02, title='DEM_demo_path', ax=ax)
 
 plt.ticklabel_format(style='plain')
