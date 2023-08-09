@@ -38,7 +38,7 @@ class MyProblem(ElementwiseProblem):
         super().__init__(n_var=int(n_grid),
                          n_obj=3,
                          n_ieq_constr=1,
-                         xl=np.array([-2] * n_grid),
+                         xl=np.array([0] * n_grid),
                          xu=np.array([2] * n_grid),
                          **kwargs)
         self.n_grid = n_grid
@@ -50,7 +50,8 @@ class MyProblem(ElementwiseProblem):
             var_list.append(x[i])
 
         # notice your function should be Min function
-        earth_volume_function = abs(sum(var_list)) * 100 * 5 + sum(abs(i) for i in var_list) * 100 * 3 # grid resolution area: 100  unit price: 5
+        earth_volume_function = abs(sum(var_list)) * 100 * 5
+        # earth_volume_function = abs(sum(var_list)) * 100 * 5 + sum(abs(i) for i in var_list) * 100 * 3 # grid resolution area: 100  unit price: 5
         flow_length_function = - path_sum_calculation(var_list)
         velocity_function = velocity_calculation(var_list)
 
