@@ -11,13 +11,13 @@ wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundt
 dem = wbe.read_raster('DEM_demo_d8.tif')
 
 # slope analysis
-basins = wbe.extract_streams(dem, threshold=83)
-wbe.write_raster(basins, 'DEM_demo_basin.tif', compress=True)
+basins = wbe.extract_streams(dem, threshold=200)
+wbe.write_raster(basins, 'DEM_demo_extract_stream.tif', compress=True)
 
 
 
 # visualization
-path_03 = '../00_data_source/DEM_demo_basin.tif'
+path_03 = '../00_data_source/DEM_demo_extract_stream.tif'
 data_03 = rs.open(path_03)
 
 fig, ax = plt.subplots(figsize=(8, 8))
@@ -32,7 +32,7 @@ plt.show()
 
 
 # value
-'''Basin_value = []
+Basin_value = []
 for row in range(basins.configs.rows):
     for col in range(basins.configs.columns):
         elev = basins[row, col]
@@ -40,5 +40,4 @@ for row in range(basins.configs.rows):
             Basin_value.append(elev)
 
 # print(Slope_value)
-print(max(Basin_value))
-print(min(Basin_value))'''
+print(sum(Basin_value))
