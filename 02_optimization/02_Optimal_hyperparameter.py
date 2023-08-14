@@ -15,7 +15,7 @@ wbe = wbw.WbEnvironment()
 wbe.verbose = False
 
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
-dem = wbe.read_raster('DEM_demo_resample.tif')
+dem = wbe.read_raster('DEM_demo_resample_02.tif')
 
 # creat a blank raster image of same size as the dem
 cut_and_fill = wbe.new_raster(dem.configs)
@@ -30,6 +30,7 @@ for row in range(dem.configs.rows):
             cut_and_fill[row, col] = 0.0
             n_grid = n_grid + 1
 
+print(n_grid)
 # ------------------------------------------ #
 # define MOO problem
 class MyProblem(ElementwiseProblem):
@@ -50,13 +51,13 @@ class MyProblem(ElementwiseProblem):
             var_list.append(x[i])
 
         # notice your function should be Min function
-        earth_volume_function = abs(sum(var_list)) * 100 * 5
+        earth_volume_function = abs(sum(var_list)) * 400 * 8
         # earth_volume_function = abs(sum(var_list)) * 100 * 5 + sum(abs(i) for i in var_list) * 100 * 3 # grid resolution area: 100  unit price: 5
         flow_length_function = - path_sum_calculation(var_list)
         velocity_function = velocity_calculation(var_list)
 
         # notice your funciotn shoube < 0
-        g1 = sum(var_list) * 100 - 100000
+        g1 = sum(var_list) * 400 - 300000
 
         out["F"] = [earth_volume_function, flow_length_function, velocity_function]
         out["G"] = [g1]
@@ -82,9 +83,9 @@ def path_sum_calculation(var_list):
     for row in range(flow_accum.configs.rows):
         for col in range(flow_accum.configs.columns):
             elev = flow_accum[row, col] # Read a cell value from a Raster
-            if elev >= 83 and elev != flow_accum.configs.nodata:
+            if elev >= 85 and elev != flow_accum.configs.nodata:
                 path_length[row, col] = 1.0
-            elif elev < 83 or elev == flow_accum.configs.nodata:
+            elif elev < 85 or elev == flow_accum.configs.nodata:
                 path_length[row, col] = 0.0
 
     path = []
@@ -94,7 +95,6 @@ def path_sum_calculation(var_list):
 
     path_sum = sum(path)
     return path_sum
-
 
 def velocity_calculation(var_list):
     i = 0
@@ -147,8 +147,8 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.termination import get_termination
 
 algorithm = NSGA2(
-    pop_size=100,
-    n_offsprings=50,
+    pop_size=200,
+    n_offsprings=100,
     sampling=FloatRandomSampling(),
     crossover=SBX(prob=0.9, eta=15),
     mutation=PM(eta=20),
@@ -181,17 +181,17 @@ plot.show()
 
 # 2D Pairwise Scatter Plots
 plt.figure(figsize=(7, 5))
-plt.scatter(F[:, 0], F[:, 1], s=30, facecolors='none', edgecolors='blue')
+plt.scatter(F[:, 0], F[:, 1], s=20, facecolors='none', edgecolors='blue')
 plt.title("Flow path length (y) and total cost (x)")
 plt.grid
 plt.show()
 
-plt.scatter(F[:, 1], F[:, 2], s=30, facecolors='none', edgecolors='blue')
+plt.scatter(F[:, 1], F[:, 2], s=20, facecolors='none', edgecolors='blue')
 plt.title("Max velocity (y) and flow path length (x)")
 plt.grid
 plt.show()
 
-plt.scatter(F[:, 0], F[:, 2], s=30, facecolors='none', edgecolors='blue')
+plt.scatter(F[:, 0], F[:, 2], s=20, facecolors='none', edgecolors='blue')
 plt.title("Max velocity (y) and total cost (x)")
 plt.grid
 plt.show()
@@ -218,12 +218,12 @@ plt.show()'''
 
 # save the data
 result_df = pd.DataFrame(F)
-result_df.to_csv('output.csv', index=False)
+result_df.to_csv('output_20m.csv', index=False)
 
 
 # visualization of solution set
-wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\03_solution'
-for i in range(10):
+wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\04_solution_20m'
+for i in range(20):
     solution = res.X[10 * i] # 每隔十个取一个解
     solution_dem = wbe.new_raster(dem.configs)
 

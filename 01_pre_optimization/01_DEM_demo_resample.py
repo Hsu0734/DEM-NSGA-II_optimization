@@ -12,17 +12,18 @@ dem = wbe.read_raster('Hanwen.tif')
 
 # hydrological analysis
 depression = wbe.fill_depressions(dem)
-resample = wbe.resample(input_rasters=[depression], cell_size=10.0)
-wbe.write_raster(resample, 'DEM_demo_resample.tif', compress=True)
+resample = wbe.resample(input_rasters=[depression], cell_size=20.0)
+# resample_depression = wbe.fill_depressions(resample)
+wbe.write_raster(resample, 'DEM_demo_resample_20m.tif', compress=True)
 
 
 
 # visualization
-path_01 = '../00_data_source/DEM_demo_resample.tif'
+path_01 = '../00_data_source/DEM_demo_resample_20m.tif'
 data_01 = rs.open(path_01)
 
 fig, ax = plt.subplots(figsize=(8, 8))
-show(data_01, title='DEM_demo_resample', ax=ax)
+show(data_01, title='DEM_demo_resample_20m', ax=ax)
 
 plt.ticklabel_format(style='plain')
 # ax.get_xaxis().get_major_formatter().set_scientific(False)  # 关闭科学计数法
