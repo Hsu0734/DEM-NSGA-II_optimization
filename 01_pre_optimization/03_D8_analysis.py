@@ -8,7 +8,7 @@ wbe.verbose = False
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
 
 # web read DEM data
-dem = wbe.read_raster('DEM_demo_resample_02.tif')
+dem = wbe.read_raster('DEM_demo_resample_20m.tif')
 
 # hydrological analysis
 flow_accu = wbe.d8_flow_accum(dem)
