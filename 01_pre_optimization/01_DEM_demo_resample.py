@@ -11,10 +11,9 @@ wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundt
 dem = wbe.read_raster('Hanwen.tif')
 
 # hydrological analysis
-depression = wbe.fill_depressions(dem)
-resample = wbe.resample(input_rasters=[depression], cell_size=20.0)
-# resample_depression = wbe.fill_depressions(resample)
-wbe.write_raster(resample, 'DEM_demo_resample_20m.tif', compress=True)
+resample = wbe.resample(input_rasters=[dem], cell_size=20.0)
+resample_depression = wbe.breach_depressions_least_cost(resample)
+wbe.write_raster(resample_depression, 'DEM_demo_resample_20m.tif', compress=True)
 
 
 
