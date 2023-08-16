@@ -11,6 +11,7 @@ wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundt
 dem = wbe.read_raster('DEM_demo_resample_20m.tif')
 
 # hydrological analysis
+depression = wbe.breach_depressions_least_cost(dem)
 flow_accu = wbe.d8_flow_accum(dem)
 wbe.write_raster(flow_accu, 'DEM_demo_d8.tif', compress=True)
 

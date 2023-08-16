@@ -17,7 +17,7 @@ wbe = wbw.WbEnvironment()
 wbe.verbose = False
 
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
-dem = wbe.read_raster('DEM_demo_resample.tif')
+dem = wbe.read_raster('DEM_demo_resample_10m.tif')
 n_grid = int(dem.configs.rows) * int(dem.configs.columns) # 栅格总数
 
 # creat a blank raster image of same size as the dem
@@ -50,12 +50,12 @@ class MyProblem(ElementwiseProblem):
             var_list.append(x[i])
 
         # notice your function should be Min function
-        earth_volume_function = sum(var_list) * 100 * 5  # grid resolution area: 100  unit price: 5
+        earth_volume_function = sum(var_list) * 100 * 8  # grid resolution area: 100  unit price: 5
         flow_length_function = - path_sum_calculation(var_list)
         velocity_function = velocity_calculation(var_list)
 
         # notice your funciotn shoube < 0
-        g1 = sum(var_list) * 100 - 50000
+        g1 = sum(var_list) * 100 - 300000
 
         out["F"] = [earth_volume_function, flow_length_function, velocity_function]
         out["G"] = [g1]

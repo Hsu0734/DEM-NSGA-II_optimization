@@ -15,7 +15,7 @@ wbe = wbw.WbEnvironment()
 wbe.verbose = False
 
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
-dem = wbe.read_raster('DEM_demo_resample.tif')
+dem = wbe.read_raster('DEM_demo_resample_10m.tif')
 
 # creat a blank raster image of same size as the dem
 cut_and_fill = wbe.new_raster(dem.configs)
@@ -82,9 +82,9 @@ def path_sum_calculation(var_list):
     for row in range(flow_accum.configs.rows):
         for col in range(flow_accum.configs.columns):
             elev = flow_accum[row, col] # Read a cell value from a Raster
-            if elev >= 83 and elev != flow_accum.configs.nodata:
+            if elev >= 291 and elev != flow_accum.configs.nodata:
                 path_length[row, col] = 1.0
-            elif elev < 83 or elev == flow_accum.configs.nodata:
+            elif elev < 291 or elev == flow_accum.configs.nodata:
                 path_length[row, col] = 0.0
 
     path = []
