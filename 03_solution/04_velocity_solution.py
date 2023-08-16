@@ -17,10 +17,10 @@ wbe.verbose = False
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\03_solution'
 
 # creat the flow_accum plot
-fig, axes = plt.subplots(nrows=2, ncols=5, figsize=(36, 12))
+fig, axes = plt.subplots(nrows=4, ncols=5, figsize=(72, 48))
 
 # read image loop
-for i in range(10):
+for i in range(20):
     filename = f'DEM_after_{10 * i}.tif'
     dem = wbe.read_raster(file_name=filename)  # read the DEM
 
@@ -31,9 +31,9 @@ for i in range(10):
     for row in range(flow_accum.configs.rows):
         for col in range(flow_accum.configs.columns):
             velo = flow_accum[row, col]
-            if velo == flow_accum.configs.nodata:
+            if velo <= 10.0 and velo == flow_accum.configs.nodata:
                 velocity[row, col] = flow_accum.configs.nodata
-            elif velo != flow_accum.configs.nodata:
+            elif velo > 10:
                 velocity[row, col] = ((flow_accum[row, col] * 0.01) ** 0.4 * slope[row, col] ** 0.3) / (
                             5 ** 0.4 * 0.03 ** 0.6)
 

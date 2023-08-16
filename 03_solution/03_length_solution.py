@@ -17,10 +17,10 @@ wbe.verbose = False
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\03_solution'
 
 # creat the flow_accum plot
-fig, axes = plt.subplots(nrows=2, ncols=5, figsize=(36, 12))
+fig, axes = plt.subplots(nrows=4, ncols=5, figsize=(72, 48))
 
 # read image loop
-for i in range(10):
+for i in range(20):
     filename = f'DEM_after_{10 * i}.tif'
     dem = wbe.read_raster(file_name=filename)  # read the DEM
 
@@ -53,21 +53,21 @@ plt.show()
 
 #----------------------#
 # creat the path length plot
-fig, axes = plt.subplots(nrows=2, ncols=5, figsize=(36, 12))
+fig, axes = plt.subplots(nrows=4, ncols=5, figsize=(72, 48))
 
 # read image loop
-for i in range(10):
+for i in range(20):
     flow_filename = f'DEM_flow_accum_{10 * i}.tif'
     dem_02 = wbe.read_raster(file_name=flow_filename)
     path_length = wbe.new_raster(dem_02.configs)
     for row in range(dem_02.configs.rows):
         for col in range(dem_02.configs.columns):
             elev = dem_02[row, col] # Read a cell value from a Raster
-            if elev >= 83.0 and elev != dem_02.configs.nodata:
+            if elev >= 291.0 and elev != dem_02.configs.nodata:
                 path_length[row, col] = 1.0 # Write the cell value of a Raster
             elif elev == dem_02.configs.nodata:
                 path_length[row, col] = dem_02.configs.nodata
-            elif elev < 83.0:
+            elif elev < 291.0:
                 path_length[row, col] = 0.0
 
     wbe.write_raster(path_length, f'DEM_path_length_{10 * i}.tif', compress=True)

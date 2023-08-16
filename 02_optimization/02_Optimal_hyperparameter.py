@@ -2,7 +2,7 @@
 Multi-objective optimization: terrain optimal module
 Author: Hanwen Xu
 Version: 1
-Date: Aug 14, 2023
+Date: Aug 16, 2023
 '''
 
 import whitebox_workflows as wbw
@@ -15,7 +15,7 @@ wbe = wbw.WbEnvironment()
 wbe.verbose = False
 
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
-dem = wbe.read_raster('DEM_demo_resample_02.tif')
+dem = wbe.read_raster('DEM_demo_resample_20m.tif')
 
 # creat a blank raster image of same size as the dem
 cut_and_fill = wbe.new_raster(dem.configs)
@@ -30,7 +30,6 @@ for row in range(dem.configs.rows):
             cut_and_fill[row, col] = 0.0
             n_grid = n_grid + 1
 
-print(n_grid)
 # ------------------------------------------ #
 # define MOO problem
 class MyProblem(ElementwiseProblem):
@@ -57,7 +56,7 @@ class MyProblem(ElementwiseProblem):
         velocity_function = velocity_calculation(var_list)
 
         # notice your funciotn shoube < 0
-        g1 = sum(var_list) * 400 - 300000
+        g1 = sum(var_list) * 400 - 75000
 
         out["F"] = [earth_volume_function, flow_length_function, velocity_function]
         out["G"] = [g1]
@@ -83,9 +82,9 @@ def path_sum_calculation(var_list):
     for row in range(flow_accum.configs.rows):
         for col in range(flow_accum.configs.columns):
             elev = flow_accum[row, col] # Read a cell value from a Raster
-            if elev >= 85 and elev != flow_accum.configs.nodata:
+            if elev >= 146 and elev != flow_accum.configs.nodata:
                 path_length[row, col] = 1.0
-            elif elev < 85 or elev == flow_accum.configs.nodata:
+            elif elev < 146 or elev == flow_accum.configs.nodata:
                 path_length[row, col] = 0.0
 
     path = []
@@ -95,6 +94,7 @@ def path_sum_calculation(var_list):
 
     path_sum = sum(path)
     return path_sum
+
 
 def velocity_calculation(var_list):
     i = 0
@@ -224,7 +224,7 @@ result_df.to_csv('output_20m.csv', index=False)
 # visualization of solution set
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\04_solution_20m'
 for i in range(20):
-    solution = res.X[10 * i] # 每隔十个取一个解
+    solution = res.X[10 * i] # 每隔五个取一个解
     solution_dem = wbe.new_raster(dem.configs)
 
     p = 0
