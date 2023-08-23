@@ -8,14 +8,13 @@ wbe.verbose = False
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
 
 # web read DEM data
-dem = wbe.read_raster('DEM_demo_resample_20m.tif')
+dem = wbe.read_raster('DEM_demo_resample_10m.tif')
 
 # hydrological analysis
-depression = wbe.breach_depressions_least_cost(dem)
-flow_accu = wbe.d8_flow_accum(dem)
+flow_accu = wbe.d8_flow_accum(dem, out_type='cells')
+
+# flow_accu = wbe.watershed(depression)
 wbe.write_raster(flow_accu, 'DEM_demo_d8.tif', compress=True)
-
-
 
 # visualization
 path_01 = '../00_data_source/DEM_demo_d8.tif'
@@ -30,6 +29,13 @@ plt.ticklabel_format(style='plain')
 # ax.get_yaxis().get_major_formatter().set_scientific(False)  # 关闭科学计数法
 # grid and show plot
 ax.grid(True, linestyle='--', color='grey')
+
+# 添加颜色条
+cbar_ax = fig.add_axes([0.92, 0.19, 0.03, 0.3])  # 调整颜色条的位置和大小
+cbar = plt.colorbar(ax.images[0], cax=cbar_ax)  # 使用 ax.images[0] 获取图像数据用于颜色条
+
+# 调整颜色条上刻度标签的字体大小
+cbar.ax.tick_params(labelsize=20)
 plt.show()
 
 # flow accumulation value

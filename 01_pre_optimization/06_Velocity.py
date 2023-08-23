@@ -14,27 +14,35 @@ velocity = wbe.new_raster(slope.configs)
 
 for row in range(slope.configs.rows):
     for col in range(slope.configs.columns):
-        elev = flow_accum[row, col]
-        if elev == flow_accum.configs.nodata:
-            velocity[row, col] = flow_accum.configs.nodata
+        elev = slope[row, col]
+        if elev == slope.configs.nodata:
+            velocity[row, col] = slope.configs.nodata
 
-        elif elev != flow_accum.configs.nodata:
-            velocity[row, col] = ((flow_accum[row, col] * 0.01) ** 0.4 * slope[row, col] ** 0.3)/(5 ** 0.4 * 0.03 ** 0.6)
+        elif elev != slope.configs.nodata:
+            #velocity[row, col] = (((flow_accum[row, col] * 100 * 0.00000833) ** 0.4) * ((slope[row, col] / 100) ** 0.3))/((10 ** 0.4) * (0.03 ** 0.6))
+            #velocity[row, col] = ((((slope[row, col] / 100) ** 0.5) * (flow_accum[row, col] * 100 * 0.00000833 / 10) ** (2/3)) / 0.03) ** 0.6
+            slope_factor = (slope[row, col] / 100) ** 0.5
+            flow_factor = (flow_accum[row, col] * 100 * 0.00000833 / 10) ** (2 / 3)
+            velocity[row, col] = (slope_factor * flow_factor / 0.03) ** 0.6
 
 wbe.write_raster(velocity, 'DEM_demo_velocity.tif', compress=True)
-
-
 
 # visualization
 path_04 = '../00_data_source/DEM_demo_velocity.tif'
 data_04 = rs.open(path_04)
 
-fig, ax = plt.subplots(figsize=(8, 8))
+fig, ax = plt.subplots(figsize=(16, 16))
+ax.tick_params(axis='both', which='major', labelsize=20)
 show(data_04, cmap='Blues', title='DEM_demo_velocity', ax=ax)
+
+# Add colorbar
+cbar_ax = fig.add_axes([0.92, 0.19, 0.03, 0.3])  # 调整颜色条的位置和大小
+cbar = plt.colorbar(ax.images[0], cax=cbar_ax)
+cbar.ax.tick_params(labelsize=20)
 
 plt.ticklabel_format(style='plain')
 # ax.get_xaxis().get_major_formatter().set_scientific(False)  # 关闭科学计数法
-# ax.get_yaxis().get_major_formatter().set_scientific(False)  # 关闭科学计数法
+ax.get_yaxis().get_major_formatter().set_scientific(False)  # 关闭科学计数法
 # grid and show plot
 ax.grid(True,  linestyle='--', color='grey')
 plt.show()

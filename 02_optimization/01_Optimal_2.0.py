@@ -53,7 +53,7 @@ class MyProblem(ElementwiseProblem):
         earth_volume_function = abs(sum(var_list)) * 100 * 8
         # earth_volume_function = abs(sum(var_list)) * 100 * 5 + sum(abs(i) for i in var_list) * 100 * 3 # grid resolution area: 100  unit price: 5
         flow_length_function = - path_sum_calculation(var_list)
-        velocity_function = velocity_calculation(var_list)
+        velocity_function = - velocity_calculation(var_list)
 
         # notice your funciotn shoube < 0
         g1 = sum(var_list) * 100 - 300000

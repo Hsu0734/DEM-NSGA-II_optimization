@@ -15,7 +15,7 @@ data_00 = rs.open(path_00)
 
 
 # creat a plot
-fig, ax = plt.subplots(figsize=(8, 8))
+fig, ax = plt.subplots(figsize=(16, 16))
 show(data_00, title='DEM_demo_resample', ax=ax)
 
 plt.ticklabel_format(style='plain')
