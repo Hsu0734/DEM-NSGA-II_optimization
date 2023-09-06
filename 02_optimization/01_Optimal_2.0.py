@@ -2,7 +2,7 @@
 Multi-objective optimization: terrain optimal module
 Author: Hanwen Xu
 Version: 1
-Date: Jul 29, 2023
+Date: Sep 06, 2023
 '''
 
 import whitebox_workflows as wbw
@@ -112,15 +112,16 @@ def velocity_calculation(var_list):
     flow_accum_02 = wbe.d8_flow_accum(dem_pop_02, out_type='cells')
     slope = wbe.slope(dem_pop_02, units="percent")
 
-    velocity = wbe.new_raster(dem_pop_02.configs)
+    velocity = wbe.new_raster(slope.configs)
 
     for row in range(slope.configs.rows):
         for col in range(slope.configs.columns):
-            velo = flow_accum_02[row, col]
+            velo = slope[row, col]
 
-            if velo == flow_accum_02.configs.nodata:
-                velocity[row, col] = 0.0
-            elif velo != flow_accum_02.configs.nodata:
+            if velo == slope.configs.nodata:
+                velocity[row, col] = slope.configs.nodata
+
+            elif velo != slope.configs.nodata:
                 slope_factor = (slope[row, col] / 100) ** 0.5
                 flow_factor = (flow_accum_02[row, col] * 100 * 0.000005701259) ** (2 / 3)
                 velocity[row, col] = (slope_factor * flow_factor / 0.03) ** 0.6
