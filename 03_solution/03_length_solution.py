@@ -63,11 +63,11 @@ for i in range(20):
     for row in range(dem_02.configs.rows):
         for col in range(dem_02.configs.columns):
             elev = dem_02[row, col] # Read a cell value from a Raster
-            if elev >= 7.18 and elev != dem_02.configs.nodata:
+            if elev >= 14.36 and elev != dem_02.configs.nodata:
                 path_length[row, col] = 1.0 # Write the cell value of a Raster
             elif elev == dem_02.configs.nodata:
                 path_length[row, col] = dem_02.configs.nodata
-            elif elev < 7.18:
+            elif elev < 14.36:
                 path_length[row, col] = 0.0
 
     wbe.write_raster(path_length, f'DEM_path_length_{10 * i}.tif', compress=True)

@@ -3,7 +3,7 @@ Whitebox tool
 Objective: solution plot
 Author: Hanwen Xu
 Version: 1
-Date: Aug 16, 2023
+Date: Jul 29, 2023
 '''
 
 import whitebox_workflows as wbw
@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 # whitebox default setting
 wbe = wbw.WbEnvironment()
 wbe.verbose = False
-wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\04_solution_20m'
+wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\03_solution'
 
 # creat the flow_accum plot
 fig, axes = plt.subplots(nrows=4, ncols=5, figsize=(72, 48))
@@ -24,7 +24,7 @@ for i in range(20):
     filename = f'DEM_after_{10 * i}.tif'
     dem = wbe.read_raster(file_name=filename)  # read the DEM
 
-    flow_accum = wbe.d8_flow_accum(dem)   # d8_analysis
+    flow_accum = wbe.d8_flow_accum(dem, out_type='cells')   # d8_analysis
     flow_filename = f'DEM_flow_accum_{10 * i}.tif'
     wbe.write_raster(flow_accum, file_name=flow_filename, compress=True)
 
@@ -63,11 +63,11 @@ for i in range(20):
     for row in range(dem_02.configs.rows):
         for col in range(dem_02.configs.columns):
             elev = dem_02[row, col] # Read a cell value from a Raster
-            if elev >= 146.0 and elev != dem_02.configs.nodata:
+            if elev >= 14.36 and elev != dem_02.configs.nodata:
                 path_length[row, col] = 1.0 # Write the cell value of a Raster
             elif elev == dem_02.configs.nodata:
                 path_length[row, col] = dem_02.configs.nodata
-            elif elev < 146.0:
+            elif elev < 14.36:
                 path_length[row, col] = 0.0
 
     wbe.write_raster(path_length, f'DEM_path_length_{10 * i}.tif', compress=True)

@@ -53,10 +53,10 @@ class MyProblem(ElementwiseProblem):
         earth_volume_function = abs(sum(var_list)) * 100 * 8
         # earth_volume_function = abs(sum(var_list)) * 100 * 5 + sum(abs(i) for i in var_list) * 100 * 3 # grid resolution area: 100  unit price: 5
         flow_length_function = - path_sum_calculation(var_list)
-        velocity_function = - velocity_calculation(var_list)
+        velocity_function = velocity_calculation(var_list)
 
         # notice your funciotn shoube < 0
-        g1 = sum(var_list) * 100 - 300000
+        g1 = sum(var_list) * 100 - 500000
 
         out["F"] = [earth_volume_function, flow_length_function, velocity_function]
         out["G"] = [g1]
@@ -81,9 +81,9 @@ def path_sum_calculation(var_list):
     for row in range(flow_accum.configs.rows):
         for col in range(flow_accum.configs.columns):
             elev = flow_accum[row, col] # Read a cell value from a Raster
-            if elev >= 7.18 and elev != flow_accum.configs.nodata:
+            if elev >= 14.36 and elev != flow_accum.configs.nodata:
                 path_length[row, col] = 1.0
-            elif elev < 7.18 or elev == flow_accum.configs.nodata:
+            elif elev < 14.36 or elev == flow_accum.configs.nodata:
                 path_length[row, col] = 0.0
 
     path = []
