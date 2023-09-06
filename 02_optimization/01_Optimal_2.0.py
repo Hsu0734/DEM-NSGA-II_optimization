@@ -73,18 +73,17 @@ def path_sum_calculation(var_list):
 
     # creat dem_pop
     dem_pop = dem - cut_and_fill
-    dem_pop_dep = wbe.breach_depressions_least_cost(dem_pop)
 
     # path length calculation
-    flow_accum = wbe.d8_flow_accum(dem_pop_dep, out_type="sca")
+    flow_accum = wbe.d8_flow_accum(dem_pop, out_type='cells')
     path_length = wbe.new_raster(flow_accum.configs)
 
     for row in range(flow_accum.configs.rows):
         for col in range(flow_accum.configs.columns):
             elev = flow_accum[row, col] # Read a cell value from a Raster
-            if elev >= 291 and elev != flow_accum.configs.nodata:
+            if elev >= 7.18 and elev != flow_accum.configs.nodata:
                 path_length[row, col] = 1.0
-            elif elev < 291 or elev == flow_accum.configs.nodata:
+            elif elev < 7.18 or elev == flow_accum.configs.nodata:
                 path_length[row, col] = 0.0
 
     path = []
@@ -108,11 +107,10 @@ def velocity_calculation(var_list):
 
     # creat dem_pop_02
     dem_pop_02 = dem - cut_and_fill
-    dem_pop_02_dep = wbe.breach_depressions_least_cost(dem_pop_02)
 
     # path length calculation
-    flow_accum_02 = wbe.d8_flow_accum(dem_pop_02_dep, out_type="sca")
-    slope = wbe.slope(dem_pop_02)
+    flow_accum_02 = wbe.d8_flow_accum(dem_pop_02, out_type='cells')
+    slope = wbe.slope(dem_pop_02, units="percent")
 
     velocity = wbe.new_raster(dem_pop_02.configs)
 
@@ -123,8 +121,9 @@ def velocity_calculation(var_list):
             if velo == flow_accum_02.configs.nodata:
                 velocity[row, col] = 0.0
             elif velo != flow_accum_02.configs.nodata:
-                velocity[row, col] = ((flow_accum_02[row, col] * 0.01) ** 0.4 * slope[row, col] ** 0.3) / (
-                            5 ** 0.4 * 0.03 ** 0.6)
+                slope_factor = (slope[row, col] / 100) ** 0.5
+                flow_factor = (flow_accum_02[row, col] * 100 * 0.000005701259) ** (2 / 3)
+                velocity[row, col] = (slope_factor * flow_factor / 0.03) ** 0.6
 
 
     Velocity_value = []
@@ -218,13 +217,13 @@ plt.show()'''
 
 # save the data
 result_df = pd.DataFrame(F)
-result_df.to_csv('output.csv', index=False)
+result_df.to_csv('output_10m.csv', index=False)
 
 
 # visualization of solution set
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\03_solution'
 for i in range(20):
-    solution = res.X[10 * i] # 每隔五个取一个解
+    solution = res.X[10 * i] # 每隔十个取一个解
     solution_dem = wbe.new_raster(dem.configs)
 
     p = 0

@@ -24,18 +24,19 @@ for i in range(20):
     filename = f'DEM_after_{10 * i}.tif'
     dem = wbe.read_raster(file_name=filename)  # read the DEM
 
-    flow_accum = wbe.d8_flow_accum(dem)   # d8_analysis
-    slope = wbe.slope(dem)
+    flow_accum = wbe.d8_flow_accum(dem, out_type='cells')   # d8_analysis
+    slope = wbe.slope(dem, units="percent")
     velocity = wbe.new_raster(dem.configs)
 
-    for row in range(flow_accum.configs.rows):
-        for col in range(flow_accum.configs.columns):
-            velo = flow_accum[row, col]
-            if velo <= 10.0 and velo == flow_accum.configs.nodata:
-                velocity[row, col] = flow_accum.configs.nodata
-            elif velo > 10:
-                velocity[row, col] = ((flow_accum[row, col] * 0.01) ** 0.4 * slope[row, col] ** 0.3) / (
-                            5 ** 0.4 * 0.03 ** 0.6)
+    for row in range(slope.configs.rows):
+        for col in range(slope.configs.columns):
+            velo = slope[row, col]
+            if velo == slope.configs.nodata:
+                velocity[row, col] = slope.configs.nodata
+            elif velo != slope.configs.nodata:
+                slope_factor = (slope[row, col] / 100) ** 0.5
+                flow_factor = (flow_accum[row, col] * 100 * 0.000005701259) ** (2 / 3)
+                velocity[row, col] = (slope_factor * flow_factor / 0.03) ** 0.6
 
 
     flow_filename = f'DEM_velocity_{10 * i}.tif'
@@ -47,7 +48,7 @@ for i in range(20):
     row = i // 5  # 行索引
     col = i % 5  # 列索引
 
-    show(data, title=f'DEM_velocity_{10 * i}', ax=axes[row, col])
+    show(data, cmap='Blues', title=f'DEM_velocity_{10 * i}', ax=axes[row, col])
     axes[row, col].set_title(f'DEM_velocity_{10 * i}')
     axes[row, col].axis('on')
     axes[row, col].ticklabel_format(style='plain')

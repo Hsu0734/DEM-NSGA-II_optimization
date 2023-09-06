@@ -24,7 +24,7 @@ for i in range(20):
     filename = f'DEM_after_{10 * i}.tif'
     dem = wbe.read_raster(file_name=filename)  # read the DEM
 
-    flow_accum = wbe.d8_flow_accum(dem)   # d8_analysis
+    flow_accum = wbe.d8_flow_accum(dem, out_type='cells')   # d8_analysis
     flow_filename = f'DEM_flow_accum_{10 * i}.tif'
     wbe.write_raster(flow_accum, file_name=flow_filename, compress=True)
 
@@ -63,11 +63,11 @@ for i in range(20):
     for row in range(dem_02.configs.rows):
         for col in range(dem_02.configs.columns):
             elev = dem_02[row, col] # Read a cell value from a Raster
-            if elev >= 291.0 and elev != dem_02.configs.nodata:
+            if elev >= 7.18 and elev != dem_02.configs.nodata:
                 path_length[row, col] = 1.0 # Write the cell value of a Raster
             elif elev == dem_02.configs.nodata:
                 path_length[row, col] = dem_02.configs.nodata
-            elif elev < 291.0:
+            elif elev < 7.18:
                 path_length[row, col] = 0.0
 
     wbe.write_raster(path_length, f'DEM_path_length_{10 * i}.tif', compress=True)
