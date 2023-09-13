@@ -2,12 +2,10 @@
 Multi-objective optimization: terrain optimal module
 Author: Hanwen Xu
 Version: 1
-Date: Jul 17, 2023
+Date: Sep 06, 2023
 '''
 
 import whitebox_workflows as wbw
-import rasterio as rs
-from rasterio.plot import show, show_hist
 from pymoo.core.problem import ElementwiseProblem
 import numpy as np
 import pandas as pd
@@ -18,17 +16,19 @@ wbe.verbose = False
 
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
 dem = wbe.read_raster('DEM_demo_resample_10m.tif')
-n_grid = int(dem.configs.rows) * int(dem.configs.columns) # 栅格总数
 
 # creat a blank raster image of same size as the dem
 cut_and_fill = wbe.new_raster(dem.configs)
+# number of valid grid
+n_grid = 0
+
 for row in range(dem.configs.rows):
     for col in range(dem.configs.columns):
         if dem[row, col] == dem.configs.nodata:
             cut_and_fill[row, col] = dem.configs.nodata
         elif dem[row, col] != dem.configs.nodata:
             cut_and_fill[row, col] = 0.0
-
+            n_grid = n_grid + 1
 
 # ------------------------------------------ #
 # define MOO problem
@@ -50,12 +50,14 @@ class MyProblem(ElementwiseProblem):
             var_list.append(x[i])
 
         # notice your function should be Min function
-        earth_volume_function = sum(var_list) * 100 * 8  # grid resolution area: 100  unit price: 5
-        flow_length_function = - path_sum_calculation(var_list)
+        # earth_volume_function = abs(sum(var_list)) * 100 * 8 / 10000
+        earth_volume_function = abs(sum(var_list)) * 100 * 8 + sum(abs(i) for i in var_list) * 100 * 4 # grid resolution area: 100  unit price: 5
+        flow_length_function = - (path_sum_calculation(var_list))
         velocity_function = velocity_calculation(var_list)
 
         # notice your funciotn shoube < 0
-        g1 = sum(var_list) * 100 - 300000
+        g1 = sum(abs(i) for i in var_list) * 100 - 100000
+        # g2 = path_sum_calculation(var_list) - 500
 
         out["F"] = [earth_volume_function, flow_length_function, velocity_function]
         out["G"] = [g1]
@@ -64,23 +66,25 @@ def path_sum_calculation(var_list):
     i = 0
     for row in range(dem.configs.rows):
         for col in range(dem.configs.columns):
-            cut_and_fill[row, col] = var_list[i]
-            i = i + 1
+            if dem[row, col] == dem.configs.nodata:
+                cut_and_fill[row, col] = dem.configs.nodata
+            elif dem[row, col] != dem.configs.nodata:
+                cut_and_fill[row, col] = var_list[i]
+                i = i + 1
 
     # creat dem_pop
-    dem_pop = dem - cut_and_fill
-    dem_pop_dep = wbe.fill_depressions(dem_pop)
+    dem_pop = dem + cut_and_fill
 
     # path length calculation
-    flow_accum = wbe.d8_flow_accum(dem_pop_dep, out_type="sca")
+    flow_accum = wbe.d8_flow_accum(dem_pop, out_type='cells')
     path_length = wbe.new_raster(flow_accum.configs)
 
     for row in range(flow_accum.configs.rows):
         for col in range(flow_accum.configs.columns):
             elev = flow_accum[row, col] # Read a cell value from a Raster
-            if elev >= 0.83 and elev != flow_accum.configs.nodata:
+            if elev >= 14.36 and elev != flow_accum.configs.nodata:
                 path_length[row, col] = 1.0
-            elif elev < 0.83 or elev == flow_accum.configs.nodata:
+            elif elev < 14.36 or elev == flow_accum.configs.nodata:
                 path_length[row, col] = 0.0
 
     path = []
@@ -96,38 +100,37 @@ def velocity_calculation(var_list):
     i = 0
     for row in range(dem.configs.rows):
         for col in range(dem.configs.columns):
-            cut_and_fill[row, col] = var_list[i]
-            i = i + 1
+            if dem[row, col] == dem.configs.nodata:
+                cut_and_fill[row, col] = dem.configs.nodata
+            elif dem[row, col] != dem.configs.nodata:
+                cut_and_fill[row, col] = var_list[i]
+                i = i + 1
 
     # creat dem_pop_02
-    dem_pop_02 = dem - cut_and_fill
-    dem_pop_02_dep = wbe.fill_depressions(dem_pop_02)
+    dem_pop_02 = dem + cut_and_fill
 
     # path length calculation
-    flow_accum = wbe.d8_flow_accum(dem_pop_02_dep, out_type="sca")
-    slope = wbe.slope(dem_pop_02)
+    flow_accum_02 = wbe.d8_flow_accum(dem_pop_02, out_type='cells')
+    slope = wbe.slope(dem_pop_02, units="percent")
 
-    velocity = wbe.new_raster(dem_pop_02.configs)
+    velocity = wbe.new_raster(flow_accum_02.configs)
 
-    for row in range(slope.configs.rows):
-        for col in range(slope.configs.columns):
-            velo = flow_accum[row, col]
-
-            if velo == flow_accum.configs.nodata:
-                velocity[row, col] = flow_accum.configs.nodata
-
-            elif velo != flow_accum.configs.nodata:
-                velocity[row, col] = ((flow_accum[row, col] * 0.01) ** 0.4 * slope[row, col] ** 0.3) / (
-                            5 ** 0.4 * 0.03 ** 0.6)
-
+    for row in range(flow_accum_02.configs.rows):
+        for col in range(flow_accum_02.configs.columns):
+            velo = flow_accum_02[row, col]
+            if velo == flow_accum_02.configs.nodata:
+                velocity[row, col] = slope.configs.nodata
+            elif velo != flow_accum_02.configs.nodata:
+                velocity[row, col] = (((flow_accum_02[row, col] * 100 * 0.000005701259) ** 0.4) * (
+                            (slope[row, col] / 100) ** 0.3)) / ((10 ** 0.4) * (0.03 ** 0.6))
+                #slope_factor = (slope[row, col] / 100) ** 0.5
+                #flow_factor = (flow_accum_02[row, col] * 100 * 0.000005701259) ** (2 / 3)
+                #velocity[row, col] = (slope_factor * flow_factor / 0.03) ** 0.6
 
     Velocity_value = []
     for row in range(velocity.configs.rows):
         for col in range(velocity.configs.columns):
-            velo = velocity[row, col]
-
-            if velo != flow_accum.configs.nodata:
-                Velocity_value.append(velocity[row, col])
+            Velocity_value.append(velocity[row, col])
 
     max_velocity = max(Velocity_value)
     return max_velocity
@@ -144,7 +147,7 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.termination import get_termination
 
 algorithm = NSGA2(
-    pop_size=500,
+    pop_size=50,
     n_offsprings=25,
     sampling=FloatRandomSampling(),
     crossover=SBX(prob=0.9, eta=15),
@@ -153,7 +156,7 @@ algorithm = NSGA2(
 )
 
 
-termination = get_termination("n_gen", 40)
+termination = get_termination("n_gen", 100)
 
 from pymoo.optimize import minimize
 res = minimize(problem,
@@ -168,50 +171,27 @@ F = res.F
 
 
 # Visualization of Objective space or Variable space
-import matplotlib.pyplot as plt
 from pymoo.visualization.scatter import Scatter
+import matplotlib.pyplot as plt
 
-# xl, xu = problem.bounds()
+# 3D Visuliaztion
+plot = Scatter(tight_layout=True)
+plot.add(F, s=10)
+plot.show()
+
+# 2D Pairwise Scatter Plots
 plt.figure(figsize=(7, 5))
-plt.scatter(F[:, 0], F[:, 1], s=30, facecolors='none', edgecolors='blue')
-plt.title("Objective Space")
-plt.show()
-
-# Decision making
-'''from pymoo.decomposition.asf import ASF
-
-weights = np.array([0.5, 0.5])
-approx_ideal = F.min(axis=0)
-approx_nadir = F.max(axis=0)
-nF = (F - approx_ideal) / (approx_nadir - approx_ideal)
-decomp = ASF()
-i = decomp.do(nF, 1/weights).argmin()
-print("Best regarding ASF: Point \ni = %s\nF = %s" % (i, F[i]))
-
-plt.figure(figsize=(7, 5))
-plt.scatter(F[:, 0], F[:, 1], s=30, facecolors='none', edgecolors='blue')
-plt.scatter(F[i, 0], F[i, 1], marker="x", color="red", s=200)
-plt.title("Objective Space")
+plt.scatter(F[:, 0], F[:, 1], s=20, facecolors='none', edgecolors='blue')
+plt.title("Flow path length (y) and total cost (x)")
 plt.grid
 plt.show()
 
+plt.scatter(F[:, 1], F[:, 2], s=20, facecolors='none', edgecolors='blue')
+plt.title("Max velocity (y) and flow path length (x)")
+plt.grid
+plt.show()
 
-# save the data
-result_df = pd.DataFrame(F)
-result_df.to_csv('output.csv', index=False)
-
-
-# visualization of solution set
-wbe.working_directory = r'D:\PhD career\05 SCI papers\06 Multi-objective optimization\MOO practices\Solution'
-for i in range(10):
-    solution = res.X[2 * i] # 每隔一个取一个解
-
-    solution_dem = wbe.new_raster(dem.configs)
-    p = 0
-    for row in range(dem.configs.rows):
-        for col in range(dem.configs.columns):
-            solution_dem[row, col] = solution[p]
-            after_dem = dem - solution_dem
-            filename = f'DEM_solution_{i}.tif'
-            wbe.write_raster(after_dem, file_name=filename, compress=True)
-            p = p + 1'''
+plt.scatter(F[:, 0], F[:, 2], s=20, facecolors='none', edgecolors='blue')
+plt.title("Max velocity (y) and total cost (x)")
+plt.grid
+plt.show()
