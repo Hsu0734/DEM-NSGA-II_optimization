@@ -147,8 +147,8 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.termination import get_termination
 
 algorithm = NSGA2(
-    pop_size=50,
-    n_offsprings=25,
+    pop_size=200,
+    n_offsprings=100,
     sampling=FloatRandomSampling(),
     crossover=SBX(prob=0.9, eta=15),
     mutation=PM(eta=20),
@@ -156,7 +156,7 @@ algorithm = NSGA2(
 )
 
 
-termination = get_termination("n_gen", 100)
+termination = get_termination("n_gen", 300)
 
 from pymoo.optimize import minimize
 res = minimize(problem,
@@ -242,7 +242,7 @@ wbe.write_raster(after_dem_minFL, file_name='min_flow_lengthe_dem', compress=Tru
 wbe.write_raster(after_dem_minV, file_name='min_velocity_dem', compress=True)
 
 
-'''
+
 # visualization of solution set
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\03_solution'
 for i in range(20):
@@ -263,4 +263,4 @@ for i in range(20):
     wbe.write_raster(after_dem, file_name=filename, compress=True)
 
     filename_X = f'DEM_solution_{10 * i}.tif'   #地形自身的改动量
-    wbe.write_raster(solution_dem, file_name=filename_X, compress=True)'''
+    wbe.write_raster(solution_dem, file_name=filename_X, compress=True)
