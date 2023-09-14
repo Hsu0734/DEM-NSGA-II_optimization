@@ -37,7 +37,7 @@ class MyProblem(ElementwiseProblem):
     def __init__(self, n_grid, **kwargs):
         super().__init__(n_var=int(n_grid),
                          n_obj=3,
-                         n_ieq_constr=1,
+                         n_ieq_constr=2,
                          xl=np.array([0] * n_grid),
                          xu=np.array([2] * n_grid),
                          **kwargs)
@@ -50,17 +50,17 @@ class MyProblem(ElementwiseProblem):
             var_list.append(x[i])
 
         # notice your function should be Min function
-        # earth_volume_function = abs(sum(var_list)) * 100 * 8 / 10000
-        earth_volume_function = abs(sum(var_list)) * 100 * 8 + sum(abs(i) for i in var_list) * 100 * 4 # grid resolution area: 100  unit price: 5
+        earth_volume_function = abs(sum(var_list)) * 100 * 8 / 10000
+        # earth_volume_function = abs(sum(var_list)) * 100 * 8 + sum(abs(i) for i in var_list) * 100 * 4 # grid resolution area: 100  unit price: 5
         flow_length_function = - (path_sum_calculation(var_list))
         velocity_function = velocity_calculation(var_list)
 
         # notice your funciotn shoube < 0
-        g1 = sum(abs(i) for i in var_list) * 100 - 100000
-        # g2 = path_sum_calculation(var_list) - 500
+        g1 = sum(abs(i) for i in var_list) * 100 - 300000
+        g2 = 510 - (path_sum_calculation(var_list))
 
         out["F"] = [earth_volume_function, flow_length_function, velocity_function]
-        out["G"] = [g1]
+        out["G"] = [g1, g2]
 
 def path_sum_calculation(var_list):
     i = 0
@@ -195,3 +195,72 @@ plt.scatter(F[:, 0], F[:, 2], s=20, facecolors='none', edgecolors='blue')
 plt.title("Max velocity (y) and total cost (x)")
 plt.grid
 plt.show()
+
+
+# save the data
+result_df = pd.DataFrame(F)
+result_df.to_csv('output_10m.csv', index=False)
+
+### Decision making ###
+min_earth_volume = np.argmin(F[:, 0])
+min_flow_length = np.argmin(F[:, 1])
+min_velocity = np.argmin(F[:, 2])
+
+min_earth_volume_solution = res.X[min_earth_volume]
+min_flow_lengthe_solution = res.X[min_flow_length]
+min_velocity_solution = res.X[min_velocity]
+
+min_earth_volume_dem = wbe.new_raster(dem.configs)
+min_flow_lengthe_dem = wbe.new_raster(dem.configs)
+min_velocity_dem = wbe.new_raster(dem.configs)
+
+wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\03_solution'
+t = 0
+for row in range(dem.configs.rows):
+    for col in range(dem.configs.columns):
+        if dem[row, col] == dem.configs.nodata:
+            min_earth_volume_dem[row, col] = dem.configs.nodata
+            min_flow_lengthe_dem[row, col] = dem.configs.nodata
+            min_velocity_dem[row, col] = dem.configs.nodata
+
+        elif dem[row, col] != dem.configs.nodata:
+            min_earth_volume_dem[row, col] = min_earth_volume_solution[t]
+            min_flow_lengthe_dem[row, col] = min_flow_lengthe_solution[t]
+            min_velocity_dem[row, col] = min_velocity_solution[t]
+            t = t + 1
+
+wbe.write_raster(min_earth_volume_dem, file_name='min_earth_volume_solution', compress=True)
+wbe.write_raster(min_flow_lengthe_dem, file_name='min_flow_lengthe_solution', compress=True)
+wbe.write_raster(min_velocity_dem, file_name='min_velocity_solution', compress=True)
+
+after_dem_minEV = dem - min_earth_volume_dem
+after_dem_minFL = dem - min_flow_lengthe_dem
+after_dem_minV = dem - min_velocity_dem
+
+wbe.write_raster(after_dem_minEV, file_name='min_earth_volume_dem', compress=True)
+wbe.write_raster(after_dem_minFL, file_name='min_flow_lengthe_dem', compress=True)
+wbe.write_raster(after_dem_minV, file_name='min_velocity_dem', compress=True)
+
+
+'''
+# visualization of solution set
+wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\03_solution'
+for i in range(20):
+    solution = res.X[10 * i] # 每隔十个取一个解
+    solution_dem = wbe.new_raster(dem.configs)
+
+    p = 0
+    for row in range(dem.configs.rows):
+        for col in range(dem.configs.columns):
+            if dem[row, col] == dem.configs.nodata:
+                solution_dem[row, col] = dem.configs.nodata
+            elif dem[row, col] != dem.configs.nodata:
+                solution_dem[row, col] = solution[p]
+                p = p + 1
+
+    after_dem = dem - solution_dem
+    filename = f'DEM_after_{10 * i}.tif'    #地形改动之后的结果
+    wbe.write_raster(after_dem, file_name=filename, compress=True)
+
+    filename_X = f'DEM_solution_{10 * i}.tif'   #地形自身的改动量
+    wbe.write_raster(solution_dem, file_name=filename_X, compress=True)'''

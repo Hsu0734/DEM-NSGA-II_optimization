@@ -2,6 +2,7 @@ import whitebox_workflows as wbw
 import rasterio as rs
 from rasterio.plot import show
 import matplotlib.pyplot as plt
+import numpy as np
 
 wbe = wbw.WbEnvironment()
 wbe.verbose = False
@@ -59,3 +60,4 @@ for row in range(velocity.configs.rows):
 # print(Velocity_value)
 print(max(Velocity_value))
 print(min(Velocity_value))
+print(np.median(Velocity_value))

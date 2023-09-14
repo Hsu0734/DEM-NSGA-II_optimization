@@ -3,17 +3,24 @@ from rasterio.plot import show
 import whitebox_workflows as wbw
 
 # read and print the DEM data
-path_00 = '../00_data_source/DEM_demo_d8.tif'
+path_00 = '../00_data_source/min_velocity_solution.tif'
 data_00 = rs.open(path_00)
 print(show(data_00))
 
+path_01 = '../00_data_source/min_earth_volume_solution.tif'
+data_01 = rs.open(path_01)
+print(show(data_01))
+
+path_02 = '../00_data_source/min_flow_lengthe_solution.tif'
+data_02 = rs.open(path_02)
+print(show(data_02))
 
 wbe = wbw.WbEnvironment()
 wbe.verbose = False
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
 
 # web read DEM data
-dem = wbe.read_raster('DEM_demo_d8.tif')
+dem = wbe.read_raster('min_velocity_solution.tif')
 
 Flow_accum_value = []
 for row in range(dem.configs.rows):

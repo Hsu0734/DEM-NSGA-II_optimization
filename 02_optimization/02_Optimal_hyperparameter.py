@@ -38,7 +38,7 @@ class MyProblem(ElementwiseProblem):
     def __init__(self, n_grid, **kwargs):
         super().__init__(n_var=int(n_grid),
                          n_obj=3,
-                         n_ieq_constr=1,
+                         n_ieq_constr=2,
                          xl=np.array([0] * n_grid),
                          xu=np.array([2] * n_grid),
                          **kwargs)
@@ -58,10 +58,10 @@ class MyProblem(ElementwiseProblem):
 
         # notice your funciotn shoube < 0
         g1 = sum(var_list) * 100 - 300000
-        # g2 = path_sum_calculation(var_list) - 500
+        g2 = 510 - path_sum_calculation(var_list)
 
         out["F"] = [earth_volume_function, flow_length_function, velocity_function]
-        out["G"] = [g1]
+        out["G"] = [g1, g2]
 
 def path_sum_calculation(var_list):
     i = 0
@@ -77,15 +77,16 @@ def path_sum_calculation(var_list):
     dem_pop = dem - cut_and_fill
 
     # path length calculation
-    flow_accum = wbe.d8_flow_accum(dem_pop, out_type='cells')
+    fill_dep = wbe.fill_depressions(dem_pop)
+    flow_accum = wbe.d8_flow_accum(fill_dep, out_type='cells')
     path_length = wbe.new_raster(flow_accum.configs)
 
     for row in range(flow_accum.configs.rows):
         for col in range(flow_accum.configs.columns):
             elev = flow_accum[row, col] # Read a cell value from a Raster
-            if elev >= 14.36 and elev != flow_accum.configs.nodata:
+            if elev >= 38.8 and elev != flow_accum.configs.nodata:
                 path_length[row, col] = 1.0
-            elif elev < 14.36 or elev == flow_accum.configs.nodata:
+            elif elev < 38.8 or elev == flow_accum.configs.nodata:
                 path_length[row, col] = 0.0
 
     path = []
@@ -111,7 +112,8 @@ def velocity_calculation(var_list):
     dem_pop_02 = dem - cut_and_fill
 
     # path length calculation
-    flow_accum_02 = wbe.d8_flow_accum(dem_pop_02, out_type='cells')
+    fill_dep_02 = wbe.fill_depressions(dem_pop_02)
+    flow_accum_02 = wbe.d8_flow_accum(fill_dep_02, out_type='cells')
     slope = wbe.slope(dem_pop_02, units="percent")
 
     velocity = wbe.new_raster(slope.configs)
@@ -119,10 +121,8 @@ def velocity_calculation(var_list):
     for row in range(slope.configs.rows):
         for col in range(slope.configs.columns):
             velo = slope[row, col]
-
             if velo == slope.configs.nodata:
                 velocity[row, col] = slope.configs.nodata
-
             elif velo != slope.configs.nodata:
                 velocity[row, col] = (((flow_accum_02[row, col] * 100 * 0.000005701259) ** 0.4) * (
                             (slope[row, col] / 100) ** 0.3)) / ((10 ** 0.4) * (0.03 ** 0.6))
@@ -151,8 +151,8 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.termination import get_termination
 
 algorithm = NSGA2(
-    pop_size=200,
-    n_offsprings=100,
+    pop_size=100,
+    n_offsprings=50,
     sampling=FloatRandomSampling(),
     crossover=SBX(prob=0.9, eta=15),
     mutation=PM(eta=20),
@@ -199,50 +199,3 @@ plt.scatter(F[:, 0], F[:, 2], s=20, facecolors='none', edgecolors='blue')
 plt.title("Max velocity (y) and total cost (x)")
 plt.grid
 plt.show()
-
-
-### Decision making ###
-'''from pymoo.decomposition.asf import ASF
-
-weights = np.array([0.5, 0.5])
-approx_ideal = F.min(axis=0)
-approx_nadir = F.max(axis=0)
-nF = (F - approx_ideal) / (approx_nadir - approx_ideal)
-decomp = ASF()
-i = decomp.do(nF, 1/weights).argmin()
-print("Best regarding ASF: Point \ni = %s\nF = %s" % (i, F[i]))
-
-plt.figure(figsize=(7, 5))
-plt.scatter(F, s=30, facecolors='none', edgecolors='blue')
-plt.scatter(F[i, 0], F[i, 1], marker="x", color="red", s=200)
-plt.title("Objective Space")
-plt.grid
-plt.show()'''
-
-
-# save the data
-result_df = pd.DataFrame(F)
-result_df.to_csv('output_10m.csv', index=False)
-
-
-# visualization of solution set
-wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\03_solution'
-for i in range(20):
-    solution = res.X[10 * i] # 每隔十个取一个解
-    solution_dem = wbe.new_raster(dem.configs)
-
-    p = 0
-    for row in range(dem.configs.rows):
-        for col in range(dem.configs.columns):
-            if dem[row, col] == dem.configs.nodata:
-                solution_dem[row, col] = dem.configs.nodata
-            elif dem[row, col] != dem.configs.nodata:
-                solution_dem[row, col] = solution[p]
-                p = p + 1
-
-    after_dem = dem - solution_dem
-    filename = f'DEM_after_{10 * i}.tif'    #地形改动之后的结果
-    wbe.write_raster(after_dem, file_name=filename, compress=True)
-
-    filename_X = f'DEM_solution_{10 * i}.tif'   #地形自身的改动量
-    wbe.write_raster(solution_dem, file_name=filename_X, compress=True)
