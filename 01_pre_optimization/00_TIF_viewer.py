@@ -11,7 +11,7 @@ path_01 = '../00_data_source/min_earth_volume_solution.tif'
 data_01 = rs.open(path_01)
 print(show(data_01))
 
-path_02 = '../00_data_source/min_flow_lengthe_solution.tif'
+path_02 = '../00_data_source/min_flow_length_solution.tif'
 data_02 = rs.open(path_02)
 print(show(data_02))
 

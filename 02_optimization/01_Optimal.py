@@ -55,7 +55,7 @@ class MyProblem(ElementwiseProblem):
         flow_length_function = - (path_sum_calculation(var_list))
         velocity_function = velocity_calculation(var_list)
 
-        # notice your funciotn shoube < 0
+        # notice your funciotn shoube <= 0
         g1 = sum(abs(i) for i in var_list) * 100 - 300000
         g2 = 510 - (path_sum_calculation(var_list))
 
@@ -230,7 +230,7 @@ for row in range(dem.configs.rows):
             t = t + 1
 
 wbe.write_raster(min_earth_volume_dem, file_name='min_earth_volume_solution', compress=True)
-wbe.write_raster(min_flow_lengthe_dem, file_name='min_flow_lengthe_solution', compress=True)
+wbe.write_raster(min_flow_lengthe_dem, file_name='min_flow_length_solution', compress=True)
 wbe.write_raster(min_velocity_dem, file_name='min_velocity_solution', compress=True)
 
 after_dem_minEV = dem - min_earth_volume_dem
@@ -238,7 +238,7 @@ after_dem_minFL = dem - min_flow_lengthe_dem
 after_dem_minV = dem - min_velocity_dem
 
 wbe.write_raster(after_dem_minEV, file_name='min_earth_volume_dem', compress=True)
-wbe.write_raster(after_dem_minFL, file_name='min_flow_lengthe_dem', compress=True)
+wbe.write_raster(after_dem_minFL, file_name='min_flow_length_dem', compress=True)
 wbe.write_raster(after_dem_minV, file_name='min_velocity_dem', compress=True)
 
 
