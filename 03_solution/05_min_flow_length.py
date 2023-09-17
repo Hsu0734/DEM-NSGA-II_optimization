@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 wbe = wbw.WbEnvironment()
 wbe.verbose = False
-wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
+wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\03_solution'
 
 # web read DEM data
 min_earth_volume = wbe.read_raster('min_earth_volume_dem.tif')

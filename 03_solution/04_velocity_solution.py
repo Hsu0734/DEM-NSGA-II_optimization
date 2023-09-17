@@ -35,7 +35,7 @@ for i in range(20):
                 velocity[row, col] = slope.configs.nodata
             elif velo != slope.configs.nodata:
                 slope_factor = (slope[row, col] / 100) ** 0.5
-                flow_factor = (flow_accum[row, col] * 100 * 0.000005701259) ** (2 / 3)
+                flow_factor = (flow_accum[row, col] * 100 * 0.000004215717) ** (2 / 3)
                 velocity[row, col] = (slope_factor * flow_factor / 0.03) ** 0.6
 
 

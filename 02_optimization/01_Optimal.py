@@ -10,6 +10,7 @@ from pymoo.core.problem import ElementwiseProblem
 import numpy as np
 import pandas as pd
 
+
 wbe = wbw.WbEnvironment()
 wbe.verbose = False
 
@@ -21,6 +22,7 @@ cut_and_fill = wbe.new_raster(dem.configs)
 
 # number of valid grid
 n_grid = 0
+
 for row in range(dem.configs.rows):
     for col in range(dem.configs.columns):
         if dem[row, col] == dem.configs.nodata:
@@ -64,14 +66,14 @@ class MyProblem(ElementwiseProblem):
         out["G"] = [g1, g2]
 
 def path_sum_calculation(var_list):
-    p = 0
+    i = 0
     for row in range(dem.configs.rows):
         for col in range(dem.configs.columns):
             if dem[row, col] == dem.configs.nodata:
                 cut_and_fill[row, col] = dem.configs.nodata
             elif dem[row, col] != dem.configs.nodata:
                 cut_and_fill[row, col] = var_list[i]
-                p = p + 1
+                i = i + 1
 
     # creat dem_pop
     dem_pop = dem - cut_and_fill
@@ -200,6 +202,7 @@ result_df = pd.DataFrame(F)
 result_df.to_csv('output_10m.csv', index=False)
 
 ### Decision making ###
+### Min Decision ###
 min_earth_volume = np.argmin(F[:, 0])
 min_flow_length = np.argmin(F[:, 1])
 min_velocity = np.argmin(F[:, 2])
@@ -225,7 +228,7 @@ for row in range(dem.configs.rows):
             min_earth_volume_dem[row, col] = min_earth_volume_solution[t]
             min_flow_length_dem[row, col] = min_flow_length_solution[t]
             min_velocity_dem[row, col] = min_velocity_solution[t]
-        t = t + 1
+            t = t + 1
 
 wbe.write_raster(min_earth_volume_dem, file_name='min_earth_volume_solution', compress=True)
 wbe.write_raster(min_flow_length_dem, file_name='min_flow_length_solution', compress=True)
@@ -238,6 +241,38 @@ after_dem_minV = dem - min_velocity_dem
 wbe.write_raster(after_dem_minEV, file_name='min_earth_volume_dem', compress=True)
 wbe.write_raster(after_dem_minFL, file_name='min_flow_length_dem', compress=True)
 wbe.write_raster(after_dem_minV, file_name='min_velocity_dem', compress=True)
+
+### balance Decision ###
+from pymoo.decomposition.asf import ASF
+
+weights = np.array([0.333, 0.333, 0.333])
+approx_ideal = F.min(axis=0)
+approx_nadir = F.max(axis=0)
+nF = (F - approx_ideal) / (approx_nadir - approx_ideal)
+decomp = ASF()
+k = decomp.do(nF, 1/weights).argmin()
+print("Best regarding ASF: Point \nk = %s\nF = %s" % (k, F[k]))
+
+plt.figure(figsize=(7, 5))
+plt.scatter(F, s=30, facecolors='none', edgecolors='blue')
+plt.scatter(F[k, 0], F[k, 1], F[k, 2], marker="x", color="red")
+plt.title("Objective Space and balance decision")
+plt.show()
+
+balance_solution = res.X[k]
+balance_dem = wbe.new_raster(dem.configs)
+q = 0
+for row in range(dem.configs.rows):
+    for col in range(dem.configs.columns):
+        if dem[row, col] == dem.configs.nodata:
+            balance_dem[row, col] = dem.configs.nodata
+        elif dem[row, col] != dem.configs.nodata:
+            balance_dem[row, col] = balance_solution[q]
+            q = q + 1
+
+wbe.write_raster(balance_dem, file_name='balance_solution', compress=True)
+after_dem_balance = dem - balance_dem
+wbe.write_raster(after_dem_balance, file_name='balance_dem', compress=True)
 
 
 # visualization of solution set
