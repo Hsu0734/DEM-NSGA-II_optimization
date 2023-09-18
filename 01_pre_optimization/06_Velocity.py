@@ -20,10 +20,10 @@ for row in range(slope.configs.rows):
             velocity[row, col] = slope.configs.nodata
 
         elif elev != slope.configs.nodata:
-            #velocity[row, col] = (((flow_accum[row, col] * 100 * 0.00000833) ** 0.4) * ((slope[row, col] / 100) ** 0.3))/((10 ** 0.4) * (0.03 ** 0.6))
-            #velocity[row, col] = ((((slope[row, col] / 100) ** 0.5) * (flow_accum[row, col] * 100 * 0.00000833 / 10) ** (2/3)) / 0.03) ** 0.6
+            #velocity[row, col] = (((flow_accum[row, col] * 100 * 0.000004215717) ** 0.4) * ((slope[row, col] / 100) ** 0.3))/((10 ** 0.4) * (0.03 ** 0.6))
+            #velocity[row, col] = ((((slope[row, col] / 100) ** 0.5) * (flow_accum[row, col] * 100 * 0.000004215717 / 10) ** (2/3)) / 0.03) ** 0.6
             slope_factor = (slope[row, col] / 100) ** 0.5
-            flow_factor = (flow_accum[row, col] * 100 * 0.000005701259) ** (2 / 3)
+            flow_factor = (flow_accum[row, col] * 100 * 0.000004215717) ** (2 / 3)
             velocity[row, col] = (slope_factor * flow_factor / 0.03) ** 0.6
 
 wbe.write_raster(velocity, 'DEM_demo_velocity.tif', compress=True)

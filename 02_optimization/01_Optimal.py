@@ -253,11 +253,10 @@ decomp = ASF()
 k = decomp.do(nF, 1/weights).argmin()
 print("Best regarding ASF: Point \nk = %s\nF = %s" % (k, F[k]))
 
-plt.figure(figsize=(7, 5))
-plt.scatter(F, s=30, facecolors='none', edgecolors='blue')
-plt.scatter(F[k, 0], F[k, 1], F[k, 2], marker="x", color="red")
-plt.title("Objective Space and balance decision")
-plt.show()
+plot = Scatter(tight_layout=True)
+plot.add(F, s=10)
+plot.add(F[k], s=50, color="red")
+plot.show()
 
 balance_solution = res.X[k]
 balance_dem = wbe.new_raster(dem.configs)
