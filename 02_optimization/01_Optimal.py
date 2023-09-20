@@ -52,7 +52,7 @@ class MyProblem(ElementwiseProblem):
             var_list.append(x[i])
 
         # notice your function should be Min function
-        earth_volume_function = abs(sum(var_list)) * 100 * 8 / 10000
+        earth_volume_function = abs(sum(var_list)) * 100 * 8 / 1000000
         # earth_volume_function = abs(sum(var_list)) * 100 * 8 + sum(abs(i) for i in var_list) * 100 * 4
         # resolution area: 100m^2  unit price: 5
         flow_length_function = - (path_sum_calculation(var_list))

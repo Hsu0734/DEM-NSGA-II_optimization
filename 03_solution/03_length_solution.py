@@ -35,10 +35,10 @@ for i in range(20):
     col = i % 5  # 列索引
 
     show(data, title=f'DEM_flow_accum_{10 * i}', ax=axes[row, col])
-    axes[row, col].set_title(f'DEM_flow_accum_{10 * i}')
-    axes[row, col].axis('on')
-    axes[row, col].ticklabel_format(style='plain')
-    axes[row, col].grid(True, linestyle='--', color='black')
+    #axes[row, col].set_title(f'DEM_flow_accum_{10 * i}')
+    #axes[row, col].axis('on')
+    #axes[row, col].ticklabel_format(style='plain')
+    #axes[row, col].grid(True, linestyle='--', color='black')
 
 cbar_ax = fig.add_axes([0.9, 0.15, 0.02, 0.7])  # 调整colorbar位置和大小
 cbar = plt.colorbar(axes[0, 0].images[0], cax=cbar_ax)
@@ -79,10 +79,10 @@ for i in range(20):
     col = i % 5  # 列索引
 
     show(data_02, title=f'DEM_path_length_{10 * i}', ax=axes[row, col])
-    axes[row, col].set_title(f'DEM_path_length_{10 * i}')
-    axes[row, col].axis('on')
-    axes[row, col].ticklabel_format(style='plain')
-    axes[row, col].grid(True, linestyle='--', color='black')
+    #axes[row, col].set_title(f'DEM_path_length_{10 * i}')
+    #axes[row, col].axis('on')
+    #axes[row, col].ticklabel_format(style='plain')
+    #axes[row, col].grid(True, linestyle='--', color='black')
 
 # plt.tight_layout()
 plt.subplots_adjust(left=0.05, right=0.88, bottom=0.1, top=0.9,
