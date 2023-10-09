@@ -156,7 +156,7 @@ algorithm = NSGA2(
 )
 
 
-termination = get_termination("n_gen", 300, additional=lambda algo, _=None: algo.n_gen == 100 or algo.n_gen == 200)
+termination = get_termination("n_gen", 100)
 
 from pymoo.optimize import minimize
 res = minimize(problem,
@@ -181,68 +181,21 @@ plot.show()
 
 # 2D Pairwise Scatter Plots
 plt.figure(figsize=(7, 5))
-plt.scatter(F[:, 0], F[:, 1], s=20, facecolors='none', edgecolors='blue')
+plt.scatter(F[:, 0], F[:, 1], s=20, facecolors='none', edgecolors='red')
 plt.title("Flow path length (y) and total cost (x)")
 plt.grid()
 plt.show()
 
-plt.scatter(F[:, 1], F[:, 2], s=20, facecolors='none', edgecolors='blue')
+plt.scatter(F[:, 1], F[:, 2], s=20, facecolors='none', edgecolors='red')
 plt.title("Max velocity (y) and flow path length (x)")
 plt.grid()
 plt.show()
 
-plt.scatter(F[:, 0], F[:, 2], s=20, facecolors='none', edgecolors='blue')
+plt.scatter(F[:, 0], F[:, 2], s=20, facecolors='none', edgecolors='red')
 plt.title("Max velocity (y) and total cost (x)")
 plt.grid()
 plt.show()
 
 
-
-# 100和200代
-generation100 = res.history[np.where(res.history["n_gen"] == 100)]
-generation200 = res.history[np.where(res.history["n_gen"] == 200)]
-
-F_100 = generation100["F"]
-plot = Scatter(tight_layout=True)
-plot.add(F_100, s=10)
-plot.show()
-
-plt.figure(figsize=(7, 5))
-plt.scatter(F_100[:, 0], F_100[:, 1], s=20, facecolors='none', edgecolors='red')
-plt.title("Flow path length (y) and total cost (x)")
-plt.grid()
-plt.show()
-
-plt.scatter(F_100[:, 1], F_100[:, 2], s=20, facecolors='none', edgecolors='red')
-plt.title("Max velocity (y) and flow path length (x)")
-plt.grid()
-plt.show()
-
-plt.scatter(F_100[:, 0], F_100[:, 2], s=20, facecolors='none', edgecolors='red')
-plt.title("Max velocity (y) and total cost (x)")
-plt.grid()
-plt.show()
-
-# 可视化200代的结果
-F_200 = generation200["F"]
-plot = Scatter(tight_layout=True)
-plot.add(F_200, s=10)
-plot.show()
-
-plt.figure(figsize=(7, 5))
-plt.scatter(F_200[:, 0], F_200[:, 1], s=20, facecolors='none', edgecolors='green')
-plt.title("Flow path length (y) and total cost (x)")
-plt.grid()
-plt.show()
-
-plt.scatter(F_200[:, 1], F_200[:, 2], s=20, facecolors='none', edgecolors='green')
-plt.title("Max velocity (y) and flow path length (x)")
-plt.grid()
-plt.show()
-
-plt.scatter(F_200[:, 0], F_200[:, 2], s=20, facecolors='none', edgecolors='green')
-plt.title("Max velocity (y) and total cost (x)")
-plt.grid()
-plt.show()
 
 

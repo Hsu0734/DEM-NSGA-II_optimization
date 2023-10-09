@@ -2,7 +2,7 @@
 Multi-objective optimization: topographic modification optimization
 Author: Hanwen Xu
 Version: 1
-Date: Sep 06, 2023
+Date: Oct 10, 2023
 """
 
 import whitebox_workflows as wbw
@@ -52,8 +52,8 @@ class MyProblem(ElementwiseProblem):
             var_list.append(x[i])
 
         # notice your function should be Min function
-        # earth_volume_function = abs(sum(var_list)) * 100 * 8 / 10000
-        earth_volume_function = (abs(sum(var_list)) * 100 * 16 + sum(abs(i) for i in var_list) * 100 * 8) / 10000
+        earth_volume_function = sum(abs(var_list)) * 100 * 8 / 1000000
+        # earth_volume_function = abs(sum(var_list)) * 100 * 8 + sum(abs(i) for i in var_list) * 100 * 4
         # resolution area: 100m^2  unit price: 5
         flow_length_function = - (path_sum_calculation(var_list))
         velocity_function = velocity_calculation(var_list)
@@ -199,7 +199,7 @@ plt.show()
 
 # save the data
 result_df = pd.DataFrame(F)
-result_df.to_csv('output_10m.csv', index=False)
+result_df.to_csv('output_10m_2.0.csv', index=False)
 
 ### Decision making ###
 ### Min Decision ###
@@ -215,7 +215,7 @@ min_earth_volume_dem = wbe.new_raster(dem.configs)
 min_flow_length_dem = wbe.new_raster(dem.configs)
 min_velocity_dem = wbe.new_raster(dem.configs)
 
-wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\03_solution'
+wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\04_solution_2.0'
 t = 0
 for row in range(dem.configs.rows):
     for col in range(dem.configs.columns):
