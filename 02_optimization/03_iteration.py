@@ -40,7 +40,7 @@ class MyProblem(ElementwiseProblem):
         super().__init__(n_var=int(n_grid),
                          n_obj=3,
                          n_ieq_constr=2,
-                         xl=np.array([0] * n_grid),
+                         xl=np.array([-2] * n_grid),
                          xu=np.array([2] * n_grid),
                          **kwargs)
         self.n_grid = n_grid
@@ -52,15 +52,15 @@ class MyProblem(ElementwiseProblem):
             var_list.append(x[i])
 
         # notice your function should be Min function
-        earth_volume_function = abs(sum(var_list)) * 100 * 8 / 1000000
+        earth_volume_function = sum(abs(i) for i in var_list) * 100 * 8 / 1000000
         # earth_volume_function = abs(sum(var_list)) * 100 * 8 + sum(abs(i) for i in var_list) * 100 * 4
         # resolution area: 100m^2  unit price: 5
         flow_length_function = - (path_sum_calculation(var_list))
         velocity_function = velocity_calculation(var_list)
 
         # notice your function should be <= 0
-        g1 = sum(abs(i) for i in var_list) * 100 - 300000
-        g2 = - (path_sum_calculation(var_list)) + 500
+        g1 = sum(abs(i) for i in var_list) * 100 - 780600
+        g2 = - (path_sum_calculation(var_list)) + 510
 
         out["F"] = [earth_volume_function, flow_length_function, velocity_function]
         out["G"] = [g1, g2]
@@ -76,7 +76,7 @@ def path_sum_calculation(var_list):
                 i = i + 1
 
     # creat dem_pop
-    dem_pop = dem - cut_and_fill
+    dem_pop = wbe.raster_calculator(expression="'dem' - 'cut_and _fill'", input_rasters=[dem, cut_and_fill])
 
     # path length calculation
     flow_accum = wbe.d8_flow_accum(dem_pop, out_type='cells')
@@ -110,7 +110,7 @@ def velocity_calculation(var_list):
                 i = i + 1
 
     # creat dem_pop_02
-    dem_pop_02 = dem - cut_and_fill
+    dem_pop_02 = wbe.raster_calculator(expression="'dem' - 'cut_and _fill'", input_rasters=[dem, cut_and_fill])
 
     # path length calculation
     flow_accum_02 = wbe.d8_flow_accum(dem_pop_02, out_type='cells')
@@ -156,7 +156,7 @@ algorithm = NSGA2(
 )
 
 
-termination = get_termination("n_gen", 100)
+termination = get_termination("n_gen", 10)
 
 from pymoo.optimize import minimize
 res = minimize(problem,
@@ -169,6 +169,9 @@ res = minimize(problem,
 X = res.X
 F = res.F
 
+# save the data
+result_df = pd.DataFrame(F)
+result_df.to_csv('output_10m_10iteration.csv', index=False)
 
 # Visualization of Objective space or Variable space
 from pymoo.visualization.scatter import Scatter
@@ -183,17 +186,17 @@ plot.show()
 plt.figure(figsize=(7, 5))
 plt.scatter(F[:, 0], F[:, 1], s=20, facecolors='none', edgecolors='red')
 plt.title("Flow path length (y) and total cost (x)")
-plt.grid()
+#plt.grid()
 plt.show()
 
 plt.scatter(F[:, 1], F[:, 2], s=20, facecolors='none', edgecolors='red')
 plt.title("Max velocity (y) and flow path length (x)")
-plt.grid()
+#plt.grid()
 plt.show()
 
 plt.scatter(F[:, 0], F[:, 2], s=20, facecolors='none', edgecolors='red')
 plt.title("Max velocity (y) and total cost (x)")
-plt.grid()
+#plt.grid()
 plt.show()
 
 

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Read and print the DEM data
-path_00 = '../03_solution/min_earth_volume_solution.tif'
+path_00 = '../04_solution_2.0/min_flow_length_solution.tif'
 data_00 = rs.open(path_00)
 
 # Read the DEM data into a NumPy array
@@ -18,7 +18,7 @@ max_elevation = np.max(dem_array[~dem_array.mask])
 fig, ax = plt.subplots(figsize=(24, 24))
 
 # Use imshow to display the DEM data with the correct color mapping
-image = ax.imshow(dem_array, vmin=min_elevation, vmax=0.8)
+image = ax.imshow(dem_array, vmin=min_elevation, vmax=max_elevation)
 show(data_00, ax=ax)
 
 # Create a colorbar
