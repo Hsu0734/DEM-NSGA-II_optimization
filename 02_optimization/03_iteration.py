@@ -156,7 +156,7 @@ algorithm = NSGA2(
 )
 
 
-termination = get_termination("n_gen", 10)
+termination = get_termination("n_gen", 50)
 
 from pymoo.optimize import minimize
 res = minimize(problem,
@@ -171,7 +171,7 @@ F = res.F
 
 # save the data
 result_df = pd.DataFrame(F)
-result_df.to_csv('output_10m_10iteration.csv', index=False)
+result_df.to_csv('output_10m_50iteration.csv', index=False)
 
 # Visualization of Objective space or Variable space
 from pymoo.visualization.scatter import Scatter
