@@ -17,6 +17,15 @@ import pandas as pd
 
 wbe = wbw.WbEnvironment()
 wbe.verbose = False
+wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
+dem = wbe.read_raster('Blank_DEM.tif')
+
+
+'''i = 0
+for row in range(dem.configs.rows):
+    for col in range(dem.configs.columns):
+        dem[row, col] == list[i]
+        i = i + 1
 
 list_00 = []
 n_grid = len(list_00)
@@ -156,4 +165,4 @@ res = minimize(problem,
                verbose=True)
 
 X = res.X
-F = res.F
+F = res.F'''
