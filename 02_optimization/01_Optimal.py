@@ -15,7 +15,7 @@ wbe = wbw.WbEnvironment()
 wbe.verbose = False
 
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
-dem = wbe.read_raster('DEM_demo_resample_10m.tif')
+dem = wbe.read_raster('Hanwen_10m.tif')
 
 # creat a blank raster image of same size as the dem
 cut_and_fill = wbe.new_raster(dem.configs)
@@ -200,6 +200,8 @@ plt.show()
 # save the data
 result_df = pd.DataFrame(F)
 result_df.to_csv('output_10m.csv', index=False)
+result_df = pd.DataFrame(X)
+result_df.to_csv('output_variable_10m.csv', index=False)
 
 ### Decision making ###
 ### Min Decision ###

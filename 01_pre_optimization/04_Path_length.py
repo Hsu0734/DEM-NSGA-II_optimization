@@ -14,10 +14,10 @@ path_length = wbe.new_raster(flow_accum.configs)
 for row in range(flow_accum.configs.rows):
     for col in range(flow_accum.configs.columns):
         elev = flow_accum[row, col] # Read a cell value from a Raster
-        if elev >= 14.36 and elev != flow_accum.configs.nodata:
+        if elev >= 91.9 and elev != flow_accum.configs.nodata: #threshold: 2m_91.9; 5m_29.12; 10m_14.36
             path_length[row, col] = 1.0 # Write the cell value of a Raster
 
-        elif elev < 14.36 and elev != flow_accum.configs.nodata:
+        elif elev < 91.9 and elev != flow_accum.configs.nodata:
             path_length[row, col] = 0.0
 
         elif elev == flow_accum.configs.nodata:
@@ -52,5 +52,3 @@ for row in range(path_length.configs.rows):
             Path_value.append(elev)
 
 print(sum(Path_value))
-
-

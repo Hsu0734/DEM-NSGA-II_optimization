@@ -3,11 +3,11 @@ from rasterio.plot import show
 import whitebox_workflows as wbw
 
 # read and print the DEM data
-path_00 = '../00_data_source/min_velocity_solution.tif'
+path_00 = '../00_data_source/FloodingCPH.tif'
 data_00 = rs.open(path_00)
 print(show(data_00))
 
-path_01 = '../00_data_source/min_earth_volume_solution.tif'
+'''path_01 = '../00_data_source/min_earth_volume_solution.tif'
 data_01 = rs.open(path_01)
 print(show(data_01))
 
@@ -29,6 +29,6 @@ for row in range(dem.configs.rows):
         if elev != dem.configs.nodata:
             print(elev)
 
-'''path_01 = '../00_data_source/DEM_demo_resample.tif'
+path_01 = '../00_data_source/DEM_demo_resample.tif'
 data_01 = rs.open(path_01)
 print(show(data_01))'''

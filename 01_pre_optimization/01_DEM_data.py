@@ -9,7 +9,7 @@ from rasterio.plot import show
 import matplotlib.pyplot as plt
 
 # read and print the DEM data
-path_00 = '../00_data_source/DEM_demo_resample_10m.tif'
+path_00 = '../00_data_source/Hanwen_10m.tif'
 data_00 = rs.open(path_00)
 # print(show(data_00, title='DTM_1km_6177_722'))
 
