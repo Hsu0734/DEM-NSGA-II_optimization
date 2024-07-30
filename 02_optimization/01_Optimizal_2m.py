@@ -15,7 +15,7 @@ wbe = wbw.WbEnvironment()
 wbe.verbose = False
 
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
-dem = wbe.read_raster('Hanwen_5m.tif')
+dem = wbe.read_raster('Hanwen_2m.tif')
 
 # creat a blank raster image of same size as the dem
 cut_and_fill = wbe.new_raster(dem.configs)
@@ -52,7 +52,7 @@ class MyProblem(ElementwiseProblem):
             var_list.append(x[i])
 
         # notice your function should be Min function
-        earth_volume_function = sum(abs(i) for i in var_list) * 25 * 8 / 1000000
+        earth_volume_function = sum(abs(i) for i in var_list) * 4 * 8 / 1000000
         # earth_volume_function = abs(sum(var_list)) * 100 * 8 + sum(abs(i) for i in var_list) * 100 * 4
         # resolution area: 100m^2  unit price: 5
         flow_length_function, velocity_function = path_sum_calculation(var_list)
@@ -87,9 +87,9 @@ def path_sum_calculation(var_list):
     for row in range(flow_accum.configs.rows):
         for col in range(flow_accum.configs.columns):
             elev = flow_accum[row, col]   # Read a cell value from a Raster
-            if elev >= 29.12 and elev != flow_accum.configs.nodata:
+            if elev >= 91.90 and elev != flow_accum.configs.nodata:
                 path_length[row, col] = - 1.0
-            elif elev < 29.12 or elev == flow_accum.configs.nodata:
+            elif elev < 91.90 or elev == flow_accum.configs.nodata:
                 path_length[row, col] = 0.0
 
     path = []
@@ -104,7 +104,7 @@ def path_sum_calculation(var_list):
                 velocity[row, col] = slope.configs.nodata
             elif velo != flow_accum.configs.nodata:
                 slope_factor = (slope[row, col] / 100) ** 0.5
-                flow_factor = (flow_accum[row, col] * 25 * 0.000004215717) ** (2 / 3)
+                flow_factor = (flow_accum[row, col] * 4 * 0.000004215717) ** (2 / 3)
                 velocity[row, col] = (slope_factor * flow_factor / 0.03) ** 0.6
 
     velocity_value = []
@@ -129,7 +129,7 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.termination import get_termination
 
 algorithm = NSGA2(
-    pop_size=400,
+    pop_size=500,
     n_offsprings=200,
     sampling=FloatRandomSampling(),
     crossover=SBX(prob=0.9, eta=15),
@@ -181,7 +181,9 @@ plt.show()
 
 # save the data
 result_df = pd.DataFrame(F)
-result_df.to_csv('output_5m.csv', index=False)
+result_df.to_csv('output_2m.csv', index=False)
+result_df = pd.DataFrame(X)
+result_df.to_csv('output_variable_2m.csv', index=False)
 
 ### Decision making ###
 ### Min Decision ###

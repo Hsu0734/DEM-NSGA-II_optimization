@@ -23,7 +23,7 @@ flow_accum_03 = wbe.d8_flow_accum(min_velocity, out_type="cells")
 slope_03 = wbe.slope(min_velocity, units='percent')
 velocity_03 = wbe.new_raster(flow_accum_03.configs)
 
-balance = wbe.read_raster('balance_dem.tif')
+balance = wbe.read_raster('min_balance_dem.tif')
 flow_accum_04 = wbe.d8_flow_accum(balance, out_type="cells")
 slope_04 = wbe.slope(balance, units='percent')
 velocity_04 = wbe.new_raster(flow_accum_04.configs)
@@ -70,7 +70,7 @@ for row in range(flow_accum_01.configs.rows):
 wbe.write_raster(velocity_01, 'min_earth_volume_velocity.tif', compress=True)
 wbe.write_raster(velocity_02, 'min_flow_length_velocity.tif', compress=True)
 wbe.write_raster(velocity_03, 'min_velocity_velocity.tif', compress=True)
-wbe.write_raster(velocity_04, 'balance_velocity.tif', compress=True)
+wbe.write_raster(velocity_04, 'min_balance_velocity.tif', compress=True)
 
 
 # visualization
@@ -154,7 +154,7 @@ for row in range(velocity_03.configs.rows):
 print(max(Path_value_03))
 
 
-path_04 = '../03_solution/balance_velocity.tif'
+path_04 = '../03_solution/min_balance_velocity.tif'
 data_04 = rs.open(path_04)
 
 fig, ax = plt.subplots(figsize=(16, 16))

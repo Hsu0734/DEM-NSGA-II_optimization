@@ -9,7 +9,7 @@ from rasterio.plot import show
 import matplotlib.pyplot as plt
 
 # read and print the DEM data
-path_00 = '../00_data_source/Hanwen_10m.tif'
+path_00 = '../00_data_source/Hanwen.tif'
 data_00 = rs.open(path_00)
 # print(show(data_00, title='DTM_1km_6177_722'))
 
@@ -22,5 +22,5 @@ plt.ticklabel_format(style='plain')
 # ax.get_yaxis().get_major_formatter().set_scientific(False)  # 关闭科学计数法
 
 # grid and show plot
-ax.grid(True, linestyle='--', color='black')
+ax.grid(True, linestyle='--', color='grey')
 plt.show()

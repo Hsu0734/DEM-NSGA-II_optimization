@@ -82,7 +82,7 @@ plt.ticklabel_format(style='plain')
 plt.show()
 
 
-path_00 = '../03_solution/balance_dem.tif'
+path_00 = '../03_solution/min_balance_dem.tif'
 data_00 = rs.open(path_00)
 
 # Read the DEM data into a NumPy array

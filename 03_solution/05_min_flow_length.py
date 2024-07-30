@@ -20,7 +20,7 @@ min_velocity = wbe.read_raster('min_velocity_dem.tif')
 flow_accum_03 = wbe.d8_flow_accum(min_velocity, out_type="cells")
 path_length_03 = wbe.new_raster(flow_accum_03.configs)
 
-balance = wbe.read_raster('balance_dem.tif')
+balance = wbe.read_raster('min_balance_dem.tif')
 flow_accum_04 = wbe.d8_flow_accum(balance, out_type="cells")
 path_length_04 = wbe.new_raster(flow_accum_04.configs)
 
@@ -71,7 +71,7 @@ for row in range(flow_accum_01.configs.rows):
 wbe.write_raster(path_length_01, 'min_earth_volume_path.tif', compress=True)
 wbe.write_raster(path_length_02, 'min_flow_length_path.tif', compress=True)
 wbe.write_raster(path_length_03, 'min_velocity_path.tif', compress=True)
-wbe.write_raster(path_length_04, 'balance_path.tif', compress=True)
+wbe.write_raster(path_length_04, 'min_balance_path.tif', compress=True)
 
 
 # visualization
@@ -140,7 +140,7 @@ for row in range(path_length_03.configs.rows):
 print(sum(Path_value_03))
 
 
-path_04 = '../03_solution/balance_path.tif'
+path_04 = '../03_solution/min_balance_path.tif'
 data_04 = rs.open(path_04)
 
 fig, ax = plt.subplots(figsize=(16, 16))
