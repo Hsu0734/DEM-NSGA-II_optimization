@@ -129,7 +129,7 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.termination import get_termination
 
 algorithm = NSGA2(
-    pop_size=400,
+    pop_size=500,
     n_offsprings=200,
     sampling=FloatRandomSampling(),
     crossover=SBX(prob=0.9, eta=15),
@@ -138,7 +138,7 @@ algorithm = NSGA2(
 )
 
 
-termination = get_termination("n_gen", 300)
+termination = get_termination("n_gen", 500)
 
 from pymoo.optimize import minimize
 res = minimize(problem,
@@ -182,6 +182,8 @@ plt.show()
 # save the data
 result_df = pd.DataFrame(F)
 result_df.to_csv('output_5m.csv', index=False)
+result_df = pd.DataFrame(X)
+result_df.to_csv('output_variable_5m.csv', index=False)
 
 ### Decision making ###
 ### Min Decision ###

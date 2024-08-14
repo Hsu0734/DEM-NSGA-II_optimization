@@ -182,6 +182,8 @@ plt.show()
 # save the data
 result_df = pd.DataFrame(F)
 result_df.to_csv('output_10m.csv', index=False)
+result_df = pd.DataFrame(X)
+result_df.to_csv('output_variable_10m.csv', index=False)
 
 ### Decision making ###
 ### Min Decision ###
