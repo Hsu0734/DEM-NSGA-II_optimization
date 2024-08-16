@@ -22,7 +22,7 @@ images = []
 
 # 遍历DEM文件
 for i in range(20):
-    filename = f'DEM_solution_{10 * i}.tif'
+    filename = f'DEM_solution_{25 * i}.tif'
     dem = wbe.read_raster(file_name=filename)
 
     for row in range(dem.configs.rows):
@@ -34,7 +34,7 @@ for i in range(20):
             elif elev_value == dem.configs.nodata:
                 dem[row, col] = np.nan
 
-    path = rf"DEM_solution_{10 * i}.tif"
+    path = rf"DEM_solution_{25 * i}.tif"
     data = rs.open(path)
 
     row = i // 5  # 行索引

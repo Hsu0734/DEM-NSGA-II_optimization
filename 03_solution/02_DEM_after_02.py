@@ -21,7 +21,7 @@ images = []
 
 # 遍历DEM文件
 for i in range(20):
-    filename = f'DEM_after_{10 * i}.tif'
+    filename = f'DEM_after_{25 * i}.tif'
     dem = wbe.read_raster(file_name=filename)
 
     for row in range(dem.configs.rows):
@@ -31,7 +31,7 @@ for i in range(20):
                 vmin = min(vmin, elev_value)
                 vmax = max(vmax, elev_value)
 
-    path = rf"DEM_after_{10 * i}.tif"
+    path = rf"DEM_after_{25 * i}.tif"
     data = rs.open(path)
 
     row = i // 5  # 行索引

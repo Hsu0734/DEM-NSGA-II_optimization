@@ -21,7 +21,7 @@ images = []
 
 # read image loop
 for i in range(20):
-    filename = f'DEM_after_{10 * i}.tif'
+    filename = f'DEM_after_{25 * i}.tif'
     dem = wbe.read_raster(file_name=filename)  # read the DEM
 
     flow_accum = wbe.d8_flow_accum(dem, out_type='cells')  # d8_analysis
@@ -44,16 +44,16 @@ for i in range(20):
                     vmin = min(vmin, velo_value)
                     vmax = max(vmax, velo_value)
 
-    flow_filename = f'DEM_velocity_{10 * i}.tif'
+    flow_filename = f'DEM_velocity_{25 * i}.tif'
     wbe.write_raster(velocity, file_name=flow_filename, compress=True)
 
-    path = rf"DEM_velocity_{10 * i}.tif"
+    path = rf"DEM_velocity_{25 * i}.tif"
     data = rs.open(path)
 
     row = i // 5  # 行索引
     col = i % 5  # 列索引
 
-    img = axes[row, col].imshow(data.read(1), cmap='Blues', vmin=vmin, vmax=vmax)  # 设置子图的颜色标度范围
+    img = axes[row, col].imshow(data.read(1), cmap='Blues', vmin=vmin, vmax=1.5)  # 设置子图的颜色标度范围
     images.append(img)
 
     # axes[row, col].set_title(f'DEM_velocity_{10 * i}')
