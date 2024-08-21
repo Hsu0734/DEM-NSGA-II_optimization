@@ -135,7 +135,7 @@ algorithm = NSGA2(
 )
 
 
-termination = get_termination("n_gen", 500)
+termination = get_termination("n_gen", 200)
 
 from pymoo.optimize import minimize
 res = minimize(problem,
