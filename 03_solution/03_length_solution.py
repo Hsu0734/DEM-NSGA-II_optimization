@@ -21,14 +21,14 @@ fig, axes = plt.subplots(nrows=4, ncols=5, figsize=(72, 48))
 
 # read image loop
 for i in range(20):
-    filename = f'DEM_after_{25 * i}.tif'
+    filename = f'DEM_after_{10 * i}.tif'
     dem = wbe.read_raster(file_name=filename)  # read the DEM
 
     flow_accum = wbe.d8_flow_accum(dem, out_type='cells')   # d8_analysis
-    flow_filename = f'DEM_flow_accum_{25 * i}.tif'
+    flow_filename = f'DEM_flow_accum_{10 * i}.tif'
     wbe.write_raster(flow_accum, file_name=flow_filename, compress=True)
 
-    path = rf"DEM_flow_accum_{25 * i}.tif"
+    path = rf"DEM_flow_accum_{10 * i}.tif"
     data = rs.open(path)
 
     row = i // 5  # 行索引
@@ -57,7 +57,7 @@ fig, axes = plt.subplots(nrows=4, ncols=5, figsize=(72, 48))
 
 # read image loop
 for i in range(20):
-    flow_filename = f'DEM_flow_accum_{25 * i}.tif'
+    flow_filename = f'DEM_flow_accum_{10 * i}.tif'
     dem_02 = wbe.read_raster(file_name=flow_filename)
     path_length = wbe.new_raster(dem_02.configs)
     for row in range(dem_02.configs.rows):
@@ -70,15 +70,15 @@ for i in range(20):
             elif elev < 14.36:
                 path_length[row, col] = 0.0
 
-    wbe.write_raster(path_length, f'DEM_path_length_{25 * i}.tif', compress=True)
+    wbe.write_raster(path_length, f'DEM_path_length_{10 * i}.tif', compress=True)
 
-    path_02 = rf"DEM_path_length_{25 * i}.tif"
+    path_02 = rf"DEM_path_length_{10 * i}.tif"
     data_02 = rs.open(path_02)
 
     row = i // 5  # 行索引
     col = i % 5  # 列索引
 
-    show(data_02, title=f'DEM_path_length_{25 * i}', ax=axes[row, col])
+    show(data_02, title=f'DEM_path_length_{10 * i}', ax=axes[row, col])
     #axes[row, col].set_title(f'DEM_path_length_{10 * i}')
     #axes[row, col].axis('on')
     #axes[row, col].ticklabel_format(style='plain')

@@ -8,7 +8,7 @@ wbe.verbose = False
 wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundtoftegade_optimization\00_data_source'
 
 # web read DEM data
-dem = wbe.read_raster('Hanwen_2m.tif')
+dem = wbe.read_raster('Hanwen_3m.tif')
 
 # slope analysis
 slope = wbe.slope(dem, units="percent")

@@ -11,13 +11,13 @@ wbe.working_directory = r'D:\PhD career\05 SCI papers\05 Lundtoftegade AKB\Lundt
 dem = wbe.read_raster('Hanwen.tif')
 
 # hydrological analysis
-resample = wbe.resample(input_rasters=[dem], cell_size=2.0)
-wbe.write_raster(resample, 'Hanwen_2m.tif', compress=True)
+resample = wbe.resample(input_rasters=[dem], cell_size=3.0)
+wbe.write_raster(resample, 'Hanwen_3m.tif', compress=True)
 
 
 
 # visualization
-path_01 = '../00_data_source/Hanwen_2m.tif'
+path_01 = '../00_data_source/Hanwen_3m.tif'
 data_01 = rs.open(path_01)
 
 fig, ax = plt.subplots(figsize=(8, 8))

@@ -126,8 +126,8 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.termination import get_termination
 
 algorithm = NSGA2(
-    pop_size=500,
-    n_offsprings=200,
+    pop_size=200,
+    n_offsprings=100,
     sampling=FloatRandomSampling(),
     crossover=SBX(prob=0.9, eta=15),
     mutation=PM(eta=20),
@@ -258,14 +258,14 @@ wbe.write_raster(after_dem_balance, file_name='min_balance_dem', compress=True)
 # visualization of solution set
 for i in range(20):
     solution = res.X[10 * i] # 每隔十个取一个解
-    solution_dem = wbe.new_raster(dem.configs)
+    solution_dem = wbe.new_raster(mask.configs)
 
     p = 0
-    for row in range(dem.configs.rows):
-        for col in range(dem.configs.columns):
-            if dem[row, col] == dem.configs.nodata:
-                solution_dem[row, col] = dem.configs.nodata
-            elif dem[row, col] != dem.configs.nodata:
+    for row in range(mask.configs.rows):
+        for col in range(mask.configs.columns):
+            if mask[row, col] == mask.configs.nodata:
+                solution_dem[row, col] = mask.configs.nodata
+            elif dem[row, col] != mask.configs.nodata:
                 solution_dem[row, col] = solution[p]
                 p = p + 1
 
