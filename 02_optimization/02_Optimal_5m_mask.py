@@ -126,8 +126,8 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.termination import get_termination
 
 algorithm = NSGA2(
-    pop_size=200,
-    n_offsprings=100,
+    pop_size=500,
+    n_offsprings=200,
     sampling=FloatRandomSampling(),
     crossover=SBX(prob=0.9, eta=15),
     mutation=PM(eta=20),
@@ -135,7 +135,7 @@ algorithm = NSGA2(
 )
 
 
-termination = get_termination("n_gen", 200)
+termination = get_termination("n_gen", 500)
 
 from pymoo.optimize import minimize
 res = minimize(problem,
