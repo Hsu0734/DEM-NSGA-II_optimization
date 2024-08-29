@@ -53,7 +53,7 @@ for i in range(20):
     row = i // 5  # 行索引
     col = i % 5  # 列索引
 
-    img = axes[row, col].imshow(data.read(1), cmap='Blues', vmin=vmin, vmax=1.5)  # 设置子图的颜色标度范围
+    img = axes[row, col].imshow(data.read(1), cmap='Blues', vmin=vmin, vmax=1.4)  # 设置子图的颜色标度范围
     images.append(img)
 
     # axes[row, col].set_title(f'DEM_velocity_{10 * i}')

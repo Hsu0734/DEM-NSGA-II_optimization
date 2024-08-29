@@ -6,7 +6,7 @@ from rasterio.plot import show
 dem_files = []
 
 for i in range(20):
-    filename = f'DEM_after_{10 * i}.tif'
+    filename = f'DEM_after_{25 * i}.tif'
     dem_files.append(filename)
 
 
@@ -22,11 +22,11 @@ for i, dem_file in enumerate(dem_files):
     row = i // 5  # 行索引
     col = i % 5  # 列索引
 
-    show(data_dem, title=f'DEM_solution_{10 * i}', ax=axes[row, col])
+    show(data_dem, title=f'DEM_solution_{25 * i}', ax=axes[row, col])
     axes[row, col].set_title(dem_file)
     axes[row, col].axis('on')
     axes[row, col].ticklabel_format(style='plain')
-    axes[row, col].grid(True, linestyle='--', color='black')
+    axes[row, col].grid(True, linestyle='--', color='grey')
 
 # 显示图形
 cbar_ax = fig.add_axes([0.9, 0.15, 0.02, 0.7])  # 调整colorbar位置和大小

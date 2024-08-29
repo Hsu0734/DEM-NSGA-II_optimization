@@ -45,8 +45,8 @@ class MyProblem(ElementwiseProblem):
                          n_obj=3,
                          n_ieq_constr=0,
                          n_eq_constr=0,
-                         xl=np.array([-1] * n_grid),
-                         xu=np.array([1] * n_grid),
+                         xl=np.array([-2] * n_grid),
+                         xu=np.array([2] * n_grid),
                          **kwargs)
         self.n_grid = n_grid
 
@@ -86,7 +86,7 @@ def path_sum_calculation(var_list):
     for row in range(flow_accum.configs.rows):
         for col in range(flow_accum.configs.columns):
             elev = flow_accum[row, col]  # Read a cell value from a Raster
-            if elev >= 54.6and elev != flow_accum.configs.nodata:
+            if elev >= 54.6 and elev != flow_accum.configs.nodata:
                 path_length[row, col] = - 1.0
             elif elev < 54.6 or elev == flow_accum.configs.nodata:
                 path_length[row, col] = 0.0
@@ -126,8 +126,8 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.termination import get_termination
 
 algorithm = NSGA2(
-    pop_size=200,
-    n_offsprings=100,
+    pop_size=500,
+    n_offsprings=200,
     sampling=FloatRandomSampling(),
     crossover=SBX(prob=0.9, eta=15),
     mutation=PM(eta=20),
@@ -135,7 +135,7 @@ algorithm = NSGA2(
 )
 
 
-termination = get_termination("n_gen", 30)
+termination = get_termination("n_gen", 200)
 
 from pymoo.optimize import minimize
 res = minimize(problem,
@@ -257,7 +257,7 @@ wbe.write_raster(after_dem_balance, file_name='min_balance_dem', compress=True)
 
 # visualization of solution set
 for i in range(20):
-    solution = res.X[10 * i] # 每隔十个取一个解
+    solution = res.X[25 * i] # 每隔十个取一个解
     solution_dem = wbe.new_raster(mask.configs)
 
     p = 0
@@ -270,8 +270,8 @@ for i in range(20):
                 p = p + 1
 
     after_dem = dem - solution_dem
-    filename = f'DEM_after_{10 * i}.tif'    #地形改动之后的结果
+    filename = f'DEM_after_{25 * i}.tif'    #地形改动之后的结果
     wbe.write_raster(after_dem, file_name=filename, compress=True)
 
-    filename_X = f'DEM_solution_{10 * i}.tif'   #地形自身的改动量
+    filename_X = f'DEM_solution_{25 * i}.tif'   #地形自身的改动量
     wbe.write_raster(solution_dem, file_name=filename_X, compress=True)
